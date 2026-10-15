@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import os
+import sys
 from collections.abc import Iterator
 from typing import Any
 
@@ -66,10 +67,19 @@ def ejecutar(nombre_agente: str, consulta: str, mostrar_saltos: bool) -> None:
 
     if mostrar_saltos:
         estado_actual: dict[str, Any] = dict(estado)
+        nodos_paralelos = set(getattr(modulo, "PARALLEL_NODES", ()))
+        nodo_fan_in = getattr(modulo, "FAN_IN_NODE", None)
+        paso_paralelo: int | None = None
         for numero, actualizacion in enumerate(
             graph.stream(estado, stream_mode="updates"), start=1
         ):
             for nodo, datos in actualizacion.items():
+                numero_visible = numero
+                if nodo in nodos_paralelos:
+                    paso_paralelo = paso_paralelo or numero
+                    numero_visible = paso_paralelo
+                elif nodo == nodo_fan_in and paso_paralelo is not None:
+                    numero_visible = paso_paralelo + 1
                 if isinstance(datos, dict):
                     for clave, valor in datos.items():
                         if clave == "messages" and isinstance(valor, list):
@@ -81,7 +91,7 @@ def ejecutar(nombre_agente: str, consulta: str, mostrar_saltos: bool) -> None:
                             estado_actual[clave] = valor
                 render_salto = getattr(modulo, "render_jump", None)
                 detalle = render_salto(nodo, datos, numero) if render_salto else None
-                _mostrar_salto(nodo, datos, numero)
+                _mostrar_salto(nodo, datos, numero_visible)
                 if detalle:
                     print(detalle)
         print("\nResumen:\n")
@@ -99,6 +109,8 @@ def ejecutar(nombre_agente: str, consulta: str, mostrar_saltos: bool) -> None:
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     load_dotenv()
     if os.getenv("GEMINI_API_KEY") and not os.getenv("GOOGLE_API_KEY"):
         os.environ["GOOGLE_API_KEY"] = os.environ["GEMINI_API_KEY"]
