@@ -57,22 +57,41 @@ def _respuesta_final(actualizacion: Any) -> str:
 def ejecutar(nombre_agente: str, consulta: str, mostrar_saltos: bool) -> None:
     modulo = importlib.import_module(f"src.{nombre_agente}.graph")
     graph = modulo.graph
-    estado = {"messages": [{"role": "user", "content": consulta}]}
+    crear_estado = getattr(modulo, "initial_state", None)
+    estado = (
+        crear_estado(consulta)
+        if crear_estado
+        else {"messages": [{"role": "user", "content": consulta}]}
+    )
 
     if mostrar_saltos:
-        ultima_actualizacion: Any = {}
+        estado_actual: dict[str, Any] = dict(estado)
         for numero, actualizacion in enumerate(
             graph.stream(estado, stream_mode="updates"), start=1
         ):
             for nodo, datos in actualizacion.items():
-                ultima_actualizacion = datos
+                if isinstance(datos, dict):
+                    for clave, valor in datos.items():
+                        if clave == "messages" and isinstance(valor, list):
+                            estado_actual[clave] = [
+                                *estado_actual.get(clave, []),
+                                *valor,
+                            ]
+                        else:
+                            estado_actual[clave] = valor
                 _mostrar_salto(nodo, datos, numero)
         print("\nResumen:\n")
-        print(_respuesta_final(ultima_actualizacion))
+        render_resultado = getattr(modulo, "render_result", None)
+        print(
+            render_resultado(estado_actual)
+            if render_resultado
+            else _respuesta_final(estado_actual)
+        )
         return
 
     resultado = graph.invoke(estado)
-    print(_respuesta_final(resultado))
+    render_resultado = getattr(modulo, "render_result", None)
+    print(render_resultado(resultado) if render_resultado else _respuesta_final(resultado))
 
 
 def main() -> None:
