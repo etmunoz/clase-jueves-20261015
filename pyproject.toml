@@ -1,0 +1,14 @@
+[project]
+name = "clase-jueves-20261015"
+version = "0.1.0"
+description = "Agentes LangGraph para la clase del jueves"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "langchain>=1.4.6",
+    "langchain-google-genai>=4.4.2",
+    "langgraph>=1.2.15",
+    "python-dotenv>=1.2.4",
+]
+
+[tool.uv]
+package = false
