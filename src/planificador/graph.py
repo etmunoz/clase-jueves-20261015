@@ -64,8 +64,10 @@ def recomendador(state: PlanificadorState) -> dict:
     }
 
 
-def quedan_pasos(state: PlanificadorState) -> Literal["recomendador", "__end__"]:
-    """Decide si el grafo debe procesar otro paso o terminar."""
+def siguiente_nodo(
+    state: PlanificadorState,
+) -> Literal["recomendador", "__end__"]:
+    """Vuelve al recomendador para el siguiente paso o finaliza el grafo."""
     if state["indice"] < len(state["pasos"]):
         return "recomendador"
     return END
@@ -76,7 +78,14 @@ workflow.add_node("planificador", planificador)
 workflow.add_node("recomendador", recomendador)
 workflow.add_edge(START, "planificador")
 workflow.add_edge("planificador", "recomendador")
-workflow.add_conditional_edges("recomendador", quedan_pasos)
+workflow.add_conditional_edges(
+    "recomendador",
+    siguiente_nodo,
+    path_map={
+        "recomendador": "recomendador",  # ciclo: procesa pasos[indice]
+        END: END,
+    },
+)
 
 graph = workflow.compile()
 
