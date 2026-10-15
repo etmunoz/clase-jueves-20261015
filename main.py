@@ -18,6 +18,21 @@ def _mensajes_de(actualizacion: Any) -> list[Any]:
     return mensajes if isinstance(mensajes, list) else [mensajes]
 
 
+def _texto_contenido(contenido: Any) -> str:
+    """Convierte contenido simple o bloques de contenido de Gemini a texto."""
+    if isinstance(contenido, str):
+        return contenido
+    if isinstance(contenido, list):
+        partes = []
+        for bloque in contenido:
+            if isinstance(bloque, dict) and bloque.get("text"):
+                partes.append(str(bloque["text"]))
+            elif isinstance(bloque, str):
+                partes.append(bloque)
+        return "".join(partes)
+    return str(contenido) if contenido else ""
+
+
 def _mostrar_salto(nodo: str, actualizacion: Any, numero: int) -> None:
     print(f"[{numero}] nodo: {nodo}")
     for mensaje in _mensajes_de(actualizacion):
@@ -33,8 +48,9 @@ def _respuesta_final(actualizacion: Any) -> str:
     mensajes = _mensajes_de(actualizacion)
     for mensaje in reversed(mensajes):
         contenido = getattr(mensaje, "content", None)
-        if contenido and getattr(mensaje, "type", None) == "ai":
-            return str(contenido)
+        texto = _texto_contenido(contenido)
+        if texto and getattr(mensaje, "type", None) == "ai":
+            return texto
     return "El agente no devolvió una respuesta."
 
 
@@ -48,8 +64,8 @@ def ejecutar(nombre_agente: str, consulta: str, mostrar_saltos: bool) -> None:
         for numero, actualizacion in enumerate(
             graph.stream(estado, stream_mode="updates"), start=1
         ):
-            ultima_actualizacion = actualizacion
             for nodo, datos in actualizacion.items():
+                ultima_actualizacion = datos
                 _mostrar_salto(nodo, datos, numero)
         print("\nResumen:\n")
         print(_respuesta_final(ultima_actualizacion))

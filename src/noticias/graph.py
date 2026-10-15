@@ -12,7 +12,7 @@ from .tools import buscar_noticias
 
 
 model = ChatGoogleGenerativeAI(
-    model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+    model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
     temperature=0,
 ).bind_tools([buscar_noticias])
 
