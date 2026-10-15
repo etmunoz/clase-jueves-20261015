@@ -79,7 +79,11 @@ def ejecutar(nombre_agente: str, consulta: str, mostrar_saltos: bool) -> None:
                             ]
                         else:
                             estado_actual[clave] = valor
+                render_salto = getattr(modulo, "render_jump", None)
+                detalle = render_salto(nodo, datos, numero) if render_salto else None
                 _mostrar_salto(nodo, datos, numero)
+                if detalle:
+                    print(detalle)
         print("\nResumen:\n")
         render_resultado = getattr(modulo, "render_result", None)
         print(
