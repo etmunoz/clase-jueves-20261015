@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 22:17
+Última modificación: 2026-10-15 22:19
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -91,8 +91,9 @@ FORMAS DE EJECUCIÓN
 
 1) Modo interactivo:
    python taller/taller.py --consulta
-   Abre un menú con opciones del 1 al 6 y permite varias consultas.
+   Abre un menú con opciones del 1 al 7 y permite varias consultas.
    En la opción 4, escribe /volver para regresar al menú.
+   La opción 7 genera grafo_ecomarket.png en la raíz del proyecto.
    Elige 0 para salir.
 
 2) Modo automático: ejecuta los cinco ejemplos:
@@ -459,6 +460,39 @@ def ejecutar_grafo_texto(consulta: str, origen="py", modo="consulta"):
     return {"ruta": "grafo", "respuesta": respuesta}
 
 
+def ejecutar_grafo_png():
+    """Genera el PNG oficial del grafo en la raíz del proyecto."""
+    inicio = datetime.now(ZONA_HORARIA)
+    try:
+        try:
+            raiz = Path(__file__).resolve().parents[1]
+        except NameError:
+            raiz = Path.cwd()
+        destino = raiz / "grafo_ecomarket.png"
+        destino.write_bytes(app.get_graph().draw_mermaid_png())
+        respuesta = f"PNG generado en: {destino}"
+        print(f"\n🖼️ {respuesta}")
+        resultado = {"ruta": "grafo_png", "respuesta": respuesta}
+        error = None
+    except Exception as exc:
+        respuesta = f"No se pudo generar el PNG: {exc}"
+        print(f"\n❌ {respuesta}")
+        resultado = {"ruta": "grafo_png", "respuesta": respuesta}
+        error = repr(exc)
+    fin = datetime.now(ZONA_HORARIA)
+    registrar_log(
+        "generar_grafo_png",
+        "Generar imagen PNG del grafo EcoMarket",
+        resultado,
+        inicio,
+        fin,
+        "py",
+        "consulta",
+        error=error,
+    )
+    return resultado
+
+
 def registrar_log(
     nombre,
     consulta,
@@ -583,6 +617,7 @@ def ejecutar_interactivo():
         print("4. Conversar con el asistente")
         print("5. Consultar ofertas")
         print("6. Escribir una consulta libre")
+        print("7. Generar PNG del grafo en la raíz del proyecto")
         print("0. Salir")
         try:
             opcion = input("Opción: ").strip()
@@ -595,6 +630,9 @@ def ejecutar_interactivo():
         if opcion == "6":
             consulta = input("Escribe tu consulta: ").strip()
             nombre = "interactivo_libre"
+        elif opcion == "7":
+            ejecutar_grafo_png()
+            continue
         elif opcion == "4":
             print("\n=== Conversación EcoMarket ===")
             print("Escribe /volver para regresar al menú principal.")
@@ -623,7 +661,7 @@ def ejecutar_interactivo():
                 f"Escribe tu consulta (Enter usa el ejemplo: {ejemplo}): "
             ).strip() or ejemplo
         else:
-            print("Opción no válida. Elige un número del 0 al 6.")
+            print("Opción no válida. Elige un número del 0 al 7.")
             continue
         ejecutar_consulta(
             consulta,

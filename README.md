@@ -81,6 +81,9 @@ El menú permite seleccionar:
 6. Escribir una consulta libre.
 0. Salir.
 
+La opción 7 genera el archivo `grafo_ecomarket.png` en la raíz del proyecto
+usando `app.get_graph().draw_mermaid_png()`.
+
 Si preguntas por el grafo, el flujo, los nodos o el diagrama, se muestra en
 la terminal el Mermaid oficial producido por:
 

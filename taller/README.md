@@ -48,6 +48,9 @@ ofertas o una consulta libre, y continuar atendiendo consultas hasta elegir
 La opción 4 mantiene un loop conversacional. Escribe varios mensajes y usa
 `/volver` para regresar al menú principal.
 
+La opción 7 genera `grafo_ecomarket.png` en la raíz del proyecto mediante
+`app.get_graph().draw_mermaid_png()`.
+
 Cada ejecución se agrega con un formato de texto legible y visual, incluyendo
 modo (`automatico` o `consulta`), inicio, fin, duración, consulta, ruta,
 resultado y respuesta. Si falla, también
