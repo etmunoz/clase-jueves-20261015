@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 21:58
+Última modificación: 2026-10-15 21:59
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -396,9 +396,9 @@ for nodo_final in ("receta", "pedido", "horarios", "ofertas", "conversar"):
 app = grafo.compile()
 
 
-def ejecutar_consulta(consulta: str, origen="py"):
+def ejecutar_consulta(consulta: str, origen="py", modo="consulta"):
     """Ejecuta una consulta, muestra la respuesta y registra el resultado."""
-    return ejecutar_y_registrar(consulta, origen=origen)
+    return ejecutar_y_registrar(consulta, origen=origen, modo=modo)
 
 
 def registrar_log(
@@ -408,6 +408,7 @@ def registrar_log(
     inicio,
     fin,
     origen,
+    modo,
     ruta_esperada=None,
     error=None,
 ):
@@ -422,6 +423,7 @@ def registrar_log(
         f"╔{separador}╗",
         "║ 🛒 ECO MARKET · REGISTRO DE EJECUCIÓN",
         f"║ {estado} · ejemplo: {nombre} · origen: {origen}",
+        f"║ 🎛️ Modo de ejecución: {modo}",
         f"║ 🕐 Inicio Santiago: {inicio.strftime('%Y-%m-%d %H:%M:%S %z')}",
         f"║ 🏁 Fin Santiago:    {fin.strftime('%Y-%m-%d %H:%M:%S %z')}",
         f"║ ⏱️ Duración:         {duracion} segundos",
@@ -456,6 +458,7 @@ def ejecutar_y_registrar(
     nombre="consulta",
     ruta_esperada=None,
     origen="py",
+    modo="consulta",
 ):
     """Crea el estado inicial, recorre el grafo, muestra y registra la respuesta."""
     consulta = consulta.strip()
@@ -474,16 +477,17 @@ def ejecutar_y_registrar(
             inicio,
             fin,
             origen,
+            modo,
             ruta_esperada,
             error=repr(error),
         )
         raise
     fin = datetime.now(ZONA_HORARIA)
-    registrar_log(nombre, consulta, resultado, inicio, fin, origen, ruta_esperada)
+    registrar_log(nombre, consulta, resultado, inicio, fin, origen, modo, ruta_esperada)
     return resultado
 
 
-def ejecutar_ejemplos(origen="py"):
+def ejecutar_ejemplos(origen="py", modo="automatico"):
     """Ejecuta automáticamente los cinco casos de prueba documentados."""
     resultados = {}
     for nombre, ejemplo in EJEMPLOS_PRUEBA.items():
@@ -494,6 +498,7 @@ def ejecutar_ejemplos(origen="py"):
             nombre=nombre,
             ruta_esperada=ejemplo["ruta_esperada"],
             origen=origen,
+            modo=modo,
         )
         resultados[nombre] = resultado
         ruta = resultado.get("ruta")
@@ -537,7 +542,12 @@ def ejecutar_interactivo():
         else:
             print("Opción no válida. Elige un número del 0 al 6.")
             continue
-        ejecutar_y_registrar(consulta, nombre=f"interactivo_{nombre}", origen="py")
+        ejecutar_y_registrar(
+            consulta,
+            nombre=f"interactivo_{nombre}",
+            origen="py",
+            modo="consulta",
+        )
 
 # ═══════════════ EJEMPLOS DE PRUEBA ═════════════════════════════════════════
 # Copia cualquiera de estas entradas en USER_INPUT para probar cada flujo.

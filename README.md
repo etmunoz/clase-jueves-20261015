@@ -126,6 +126,7 @@ kernel antes de ejecutar todo nuevamente.
 
 Cada ejecución registra un bloque de texto legible con:
 
+- Modo: `automatico` o `consulta`.
 - Inicio y fin.
 - Duración.
 - Zona horaria `America/Santiago`.

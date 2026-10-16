@@ -45,7 +45,8 @@ ofertas o una consulta libre, y continuar atendiendo consultas hasta elegir
 `0. Salir`.
 
 Cada ejecución se agrega con un formato de texto legible y visual, incluyendo
-inicio, fin, duración, consulta, ruta, resultado y respuesta. Si falla, también
+modo (`automatico` o `consulta`), inicio, fin, duración, consulta, ruta,
+resultado y respuesta. Si falla, también
 guarda el error. Los archivos son independientes:
 
 - `taller/ejecuciones_py.log`: ejecuciones de `taller.py`.
