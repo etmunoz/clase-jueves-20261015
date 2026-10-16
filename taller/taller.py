@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 22:16
+Última modificación: 2026-10-15 22:17
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -83,8 +83,8 @@ El programa atiende cinco flujos mediante LangGraph:
   3. Horarios      → consulta horarios de despacho.
   4. Conversación  → responde usando el asistente.
   5. Ofertas       → bonus con promociones simuladas.
-  Si preguntas por el grafo, diagrama, flujo o nodos, se muestra en ASCII
-  directamente en pantalla sin llamar al modelo.
+  Si preguntas por el grafo, diagrama, flujo o nodos, se muestra el Mermaid
+  oficial generado por app.get_graph().draw_mermaid(), sin llamar al modelo.
 
 FORMAS DE EJECUCIÓN
 --------------------
@@ -436,21 +436,8 @@ def solicita_grafo(consulta: str) -> bool:
 
 
 def grafo_en_texto() -> str:
-    """Devuelve una representación visual compatible con cualquier terminal."""
-    return """
-┌─────────┐
-│  START  │
-└────┬────┘
-     ▼
-┌─────────┐
-│ ROUTER  │  Clasifica la intención
-└────┬────┘
-     ├──────────────► RECETA ───────► END
-     ├──────────────► PEDIDO ───────► END
-     ├──────────────► HORARIOS ─────► END
-     ├──────────────► OFERTAS ──────► END
-     └──────────────► CONVERSAR ────► END
-""".strip()
+    """Devuelve el diagrama oficial Mermaid generado por LangGraph."""
+    return app.get_graph().draw_mermaid()
 
 
 def ejecutar_grafo_texto(consulta: str, origen="py", modo="consulta"):

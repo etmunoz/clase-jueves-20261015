@@ -82,15 +82,10 @@ El menú permite seleccionar:
 0. Salir.
 
 Si preguntas por el grafo, el flujo, los nodos o el diagrama, se muestra en
-ASCII directamente en la terminal sin consumir una llamada al modelo:
+la terminal el Mermaid oficial producido por:
 
 ```text
-START → ROUTER
-          ├── RECETA    → END
-          ├── PEDIDO    → END
-          ├── HORARIOS  → END
-          ├── OFERTAS   → END
-          └── CONVERSAR → END
+app.get_graph().draw_mermaid()
 ```
 
 Se pueden realizar varias consultas en una misma ejecución.
