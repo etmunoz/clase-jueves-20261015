@@ -44,6 +44,9 @@ El menú interactivo permite elegir recetas, pedidos, horarios, conversación,
 ofertas o una consulta libre, y continuar atendiendo consultas hasta elegir
 `0. Salir`.
 
+La opción 4 mantiene un loop conversacional. Escribe varios mensajes y usa
+`/volver` para regresar al menú principal.
+
 Cada ejecución se agrega con un formato de texto legible y visual, incluyendo
 modo (`automatico` o `consulta`), inicio, fin, duración, consulta, ruta,
 resultado y respuesta. Si falla, también

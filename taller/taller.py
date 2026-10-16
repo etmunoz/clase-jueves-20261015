@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 22:07
+Última modificación: 2026-10-15 22:10
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -79,6 +79,7 @@ FORMAS DE EJECUCIÓN
 1) Modo interactivo:
    python taller/taller.py --consulta
    Abre un menú con opciones del 1 al 6 y permite varias consultas.
+   En la opción 4, escribe /volver para regresar al menú.
    Elige 0 para salir.
 
 2) Modo automático: ejecuta los cinco ejemplos:
@@ -537,6 +538,28 @@ def ejecutar_interactivo():
         if opcion == "6":
             consulta = input("Escribe tu consulta: ").strip()
             nombre = "interactivo_libre"
+        elif opcion == "4":
+            print("\n=== Conversación EcoMarket ===")
+            print("Escribe /volver para regresar al menú principal.")
+            while True:
+                try:
+                    consulta = input("Tú: ").strip()
+                except EOFError:
+                    print("\nEntrada finalizada.")
+                    return
+                if consulta.lower() == "/volver":
+                    print("Regresando al menú principal.")
+                    break
+                if not consulta:
+                    print("Escribe un mensaje o /volver para salir.")
+                    continue
+                ejecutar_y_registrar(
+                    consulta,
+                    nombre="interactivo_conversacion",
+                    origen="py",
+                    modo="consulta",
+                )
+            continue
         elif opcion in opciones:
             nombre, ejemplo = opciones[opcion]
             consulta = input(
