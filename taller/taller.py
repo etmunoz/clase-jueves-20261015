@@ -19,13 +19,42 @@ import os
 import re
 from typing import TypedDict, Literal
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 
-from plataforma import chat, texto, trazar
+load_dotenv()
+
+try:
+    # Disponible dentro de la plataforma oficial del taller.
+    from plataforma import chat, texto, trazar
+except ModuleNotFoundError:
+    # Fallback local para ejecutar el .py o el notebook fuera de la plataforma.
+    chat = None
+
+    def texto(respuesta):
+        """Convierte una respuesta de LangChain en texto imprimible."""
+        contenido = getattr(respuesta, "content", respuesta)
+        if isinstance(contenido, str):
+            return contenido
+        if isinstance(contenido, list):
+            return "".join(
+                str(bloque.get("text", ""))
+                if isinstance(bloque, dict)
+                else str(bloque)
+                for bloque in contenido
+            )
+        return str(contenido)
+
+    def trazar(app, inicial, responder_desde="respuesta"):
+        """Ejecutor local equivalente al trazador de la plataforma."""
+        final = app.invoke(inicial)
+        print(f"[local] ruta: {final.get('ruta', '')}")
+        print(final.get(responder_desde, ""))
+        return final
 
 # ── La key viene del panel API keys (o backend/.env) — NUNCA del código ────
 if not os.environ.get("GOOGLE_API_KEY"):

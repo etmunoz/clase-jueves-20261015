@@ -55,6 +55,7 @@ usa los datos de la tool correspondiente.
 
 ## Nota sobre la plataforma
 
-El archivo depende de `plataforma` para `chat`, `texto` y `trazar`, por lo que
-la validación completa debe hacerse dentro del notebook o entorno del taller,
-con `GOOGLE_API_KEY` configurada en el panel de API keys.
+El archivo usa `plataforma` para `chat`, `texto` y `trazar` cuando está
+disponible. Fuera de la plataforma incluye un fallback local para `texto` y
+`trazar`, por lo que el notebook no falla con `ModuleNotFoundError`; en ambos
+casos se necesita `GOOGLE_API_KEY` configurada en el panel o en `.env`.
