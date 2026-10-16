@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 22:15
+Última modificación: 2026-10-15 22:16
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -57,6 +57,17 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 load_dotenv()
+
+
+def asegurar_logs():
+    """Crea los dos archivos de log si todavía no existen."""
+    carpeta_logs = Path("taller")
+    carpeta_logs.mkdir(parents=True, exist_ok=True)
+    for nombre in ("ejecuciones_py.log", "ejecuciones_ipynb.log"):
+        (carpeta_logs / nombre).touch(exist_ok=True)
+
+
+asegurar_logs()
 
 
 def mostrar_ayuda():
