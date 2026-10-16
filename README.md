@@ -71,7 +71,8 @@ python taller/taller.py --ayuda
 python taller/taller.py --consulta
 ```
 
-El menú permite seleccionar:
+El modo conversacional inicia directamente en el chat. Escribe `/opciones`
+para mostrar el menú estructurado:
 
 1. Recomendar recetas.
 2. Consultar estado de pedido.
@@ -79,7 +80,9 @@ El menú permite seleccionar:
 4. Conversar con el asistente.
 5. Consultar ofertas.
 6. Escribir una consulta libre.
-0. Salir.
+7. Mostrar Mermaid y generar PNG del grafo.
+
+Escribe `/salir` para terminar la conversación.
 
 La opción 7 imprime en pantalla el Mermaid oficial usando
 `app.get_graph().draw_mermaid()` y genera el archivo
@@ -92,7 +95,7 @@ la terminal el Mermaid oficial producido por:
 app.get_graph().draw_mermaid()
 ```
 
-Se pueden realizar varias consultas en una misma ejecución.
+Se pueden realizar varias consultas en una misma ejecución sin volver al menú.
 
 ### Modo automático
 
@@ -118,7 +121,7 @@ El notebook tiene cuatro celdas:
 3. **Ejemplos:** muestra las consultas disponibles y sus rutas esperadas.
 4. **Ejecución:** permite elegir entre una consulta o todos los ejemplos.
 
-Para una consulta individual, edita la tercera celda:
+Para una consulta individual, edita la cuarta celda:
 
 ```python
 MODO = "consulta"

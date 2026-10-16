@@ -15,7 +15,7 @@ router → flujo especializado → END
 Antes de entregar, ejecutar todo el notebook desde cero en la plataforma y
 probar las consultas indicadas en `.opencode/implementador.md`.
 
-En `taller.ipynb`, escribe la consulta en la segunda celda, en la variable
+En `taller.ipynb`, escribe la consulta en la cuarta celda, en la variable
 `USER_INPUT`, y ejecuta esa celda:
 
 ```python
@@ -41,9 +41,8 @@ python taller/taller.py --consulta
 python taller/taller.py --automatico
 ```
 
-El menú interactivo permite elegir recetas, pedidos, horarios, conversación,
-ofertas o una consulta libre, y continuar atendiendo consultas hasta elegir
-`0. Salir`.
+El modo `--consulta` entra directamente al chat. Escribe `/opciones` para
+mostrar el menú estructurado y `/salir` para terminar.
 
 La opción 4 mantiene un loop conversacional. El modo `--consulta` entra
 directamente al chat; escribe `/opciones` para ver el menú estructurado y
