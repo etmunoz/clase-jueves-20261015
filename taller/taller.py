@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 21:49
+Última modificación: 2026-10-15 21:53
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -58,6 +58,63 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 load_dotenv()
+
+
+def mostrar_ayuda():
+    """Explica cómo ejecutar y evaluar el taller desde el archivo Python."""
+    print(
+        """
+TALLER ECOMARKET · GUÍA DE USO
+==============================
+
+El programa atiende cinco flujos mediante LangGraph:
+  1. Recetas       → tools de recetas y precios.
+  2. Pedido        → consulta el estado de un pedido.
+  3. Horarios      → consulta horarios de despacho.
+  4. Conversación  → responde usando el asistente.
+  5. Ofertas       → bonus con promociones simuladas.
+
+FORMAS DE EJECUCIÓN
+--------------------
+
+1) Modo interactivo (predeterminado):
+   python taller/taller.py
+   Abre un menú con opciones del 1 al 6 y permite varias consultas.
+   Elige 0 para salir.
+
+2) Modo automático: ejecuta los cinco ejemplos:
+   PowerShell:
+   $env:MODO = "automatico"
+   python taller/taller.py
+
+3) Una consulta específica, sin menú:
+   PowerShell:
+   $env:MODO = "consulta"
+   $env:USER_INPUT = "¿Cuál es el estado del pedido 1042?"
+   python taller/taller.py
+
+4) Ayuda:
+   python taller/taller.py --ayuda
+
+NOTEBOOK
+--------
+Abre taller/taller.ipynb con el kernel Python 3.12 (.venv).
+Ejecuta la primera celda, revisa los ejemplos en la segunda y selecciona
+MODO/USER_INPUT en la tercera.
+
+LOGS
+----
+Las ejecuciones del .py se guardan en taller/ejecuciones_py.log.
+Las ejecuciones del notebook se guardan en taller/ejecuciones_ipynb.log.
+Cada línea JSON registra inicio, fin, duración, ruta y respuesta.
+"""
+    )
+
+
+if "--ayuda" in sys.argv:
+    mostrar_ayuda()
+    raise SystemExit(0)
+
 ZONA_HORARIA = ZoneInfo("America/Santiago")
 
 # Ejecutor local: el proyecto usa directamente el entorno virtual.
