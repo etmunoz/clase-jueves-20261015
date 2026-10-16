@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 22:10
+Última modificación: 2026-10-15 22:15
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -72,6 +72,8 @@ El programa atiende cinco flujos mediante LangGraph:
   3. Horarios      → consulta horarios de despacho.
   4. Conversación  → responde usando el asistente.
   5. Ofertas       → bonus con promociones simuladas.
+  Si preguntas por el grafo, diagrama, flujo o nodos, se muestra en ASCII
+  directamente en pantalla sin llamar al modelo.
 
 FORMAS DE EJECUCIÓN
 --------------------
@@ -397,9 +399,66 @@ for nodo_final in ("receta", "pedido", "horarios", "ofertas", "conversar"):
 app = grafo.compile()
 
 
-def ejecutar_consulta(consulta: str, origen="py", modo="consulta"):
+def ejecutar_consulta(
+    consulta: str,
+    origen="py",
+    modo="consulta",
+    nombre="consulta",
+    ruta_esperada=None,
+):
     """Ejecuta una consulta, muestra la respuesta y registra el resultado."""
-    return ejecutar_y_registrar(consulta, origen=origen, modo=modo)
+    if solicita_grafo(consulta):
+        return ejecutar_grafo_texto(consulta, origen, modo)
+    return ejecutar_y_registrar(
+        consulta,
+        nombre=nombre,
+        ruta_esperada=ruta_esperada,
+        origen=origen,
+        modo=modo,
+    )
+
+
+def solicita_grafo(consulta: str) -> bool:
+    """Detecta si el usuario pide ver el grafo o el flujo del agente."""
+    palabras = ("grafo", "diagrama", "flujo", "nodos", "langgraph")
+    return any(palabra in consulta.lower() for palabra in palabras)
+
+
+def grafo_en_texto() -> str:
+    """Devuelve una representación visual compatible con cualquier terminal."""
+    return """
+┌─────────┐
+│  START  │
+└────┬────┘
+     ▼
+┌─────────┐
+│ ROUTER  │  Clasifica la intención
+└────┬────┘
+     ├──────────────► RECETA ───────► END
+     ├──────────────► PEDIDO ───────► END
+     ├──────────────► HORARIOS ─────► END
+     ├──────────────► OFERTAS ──────► END
+     └──────────────► CONVERSAR ────► END
+""".strip()
+
+
+def ejecutar_grafo_texto(consulta: str, origen="py", modo="consulta"):
+    """Muestra y registra el diagrama solicitado sin llamar al modelo."""
+    inicio = datetime.now(ZONA_HORARIA)
+    respuesta = grafo_en_texto()
+    print(f"[local] ruta: grafo · modo: {modo}")
+    print(respuesta)
+    fin = datetime.now(ZONA_HORARIA)
+    registrar_log(
+        "consulta_grafo",
+        consulta,
+        {"ruta": "grafo", "respuesta": respuesta},
+        inicio,
+        fin,
+        origen,
+        modo,
+    )
+    return {"ruta": "grafo", "respuesta": respuesta}
 
 
 def registrar_log(
@@ -553,7 +612,7 @@ def ejecutar_interactivo():
                 if not consulta:
                     print("Escribe un mensaje o /volver para salir.")
                     continue
-                ejecutar_y_registrar(
+                ejecutar_consulta(
                     consulta,
                     nombre="interactivo_conversacion",
                     origen="py",
@@ -568,7 +627,7 @@ def ejecutar_interactivo():
         else:
             print("Opción no válida. Elige un número del 0 al 6.")
             continue
-        ejecutar_y_registrar(
+        ejecutar_consulta(
             consulta,
             nombre=f"interactivo_{nombre}",
             origen="py",

@@ -81,6 +81,18 @@ El menú permite seleccionar:
 6. Escribir una consulta libre.
 0. Salir.
 
+Si preguntas por el grafo, el flujo, los nodos o el diagrama, se muestra en
+ASCII directamente en la terminal sin consumir una llamada al modelo:
+
+```text
+START → ROUTER
+          ├── RECETA    → END
+          ├── PEDIDO    → END
+          ├── HORARIOS  → END
+          ├── OFERTAS   → END
+          └── CONVERSAR → END
+```
+
 Se pueden realizar varias consultas en una misma ejecución.
 
 ### Modo automático
