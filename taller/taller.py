@@ -28,8 +28,7 @@ from langgraph.graph import StateGraph, START, END
 
 load_dotenv()
 
-# Ejecutor local: el proyecto usa el entorno virtual y no depende de
-# `plataforma`, que solo existe en el entorno privado del taller.
+# Ejecutor local: el proyecto usa directamente el entorno virtual.
 def texto(respuesta):
     """Convierte una respuesta de LangChain en texto imprimible."""
     contenido = getattr(respuesta, "content", respuesta)
@@ -63,8 +62,8 @@ llm = ChatGoogleGenerativeAI(model=os.environ.get("GEMINI_FLASH_LITE_MODEL", "ge
 # ═══════════════════════ ENTREGA · OBLIGATORIO PARA LA EVALUACIÓN ═══════════════════════
 # EQUIPO: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # 1. Escribe los nombres REALES de los integrantes del equipo.
-# 2. Pega aquí tus prompts finales. En el notebook NO existen las variables de la pestaña Prompts
-#    de la plataforma: si los dejas vacíos, el agente no rutea ni cocina y la evaluación falla.
+# 2. Pega aquí tus prompts finales. En el notebook NO existen variables externas de Prompts:
+#    si los dejas vacíos, el agente no rutea ni cocina y la evaluación falla.
 # 3. Antes de enviar: Kernel → Restart & Run All. TODO el notebook debe correr sin errores.
 # 4. Se entrega UN .zip (apellido_nombre.zip) con: este notebook, plan.json y la carpeta .opencode/ (spec.md e implementador.md).
 INTEGRANTES = ["Fabio Durán", "Gustavo Reyes", "Ezequiel Muñoz"]
@@ -91,7 +90,8 @@ consulta requiere buscar recetas, pedidos, horarios u ofertas, no inventes la
 información: el router debe enviarla al flujo correspondiente.
 """.strip()
 
-# En la plataforma mandan los de la pestaña Prompts; en el notebook, los que pegaste arriba.
+# En el sistema de evaluación pueden configurarse prompts externos; en el notebook,
+# se usan los prompts pegados arriba.
 PROMPT_ROUTER = os.environ.get("PROMPT_ROUTER") or PROMPT_ROUTER_ENTREGA        # Router
 PROMPT_CHEF = os.environ.get("PROMPT_CHEF") or PROMPT_CHEF_ENTREGA              # Recetas
 PROMPT_ASISTENTE = os.environ.get("PROMPT_ASISTENTE") or PROMPT_ASISTENTE_ENTREGA  # Conversacion
@@ -207,7 +207,7 @@ def router(estado: Estado):
 def conversar(estado: Estado):
     """FLUJO CONVERSACIONAL: responde con memoria del chat.
 
-    La plataforma inyecta el historial en CHAT_HISTORY: pasarselo al LLM
+    El entorno de ejecución inyecta el historial en CHAT_HISTORY: pasárselo al LLM
     es lo que convierte respuestas sueltas en una CONVERSACION."""
     historial = os.environ.get("CHAT_HISTORY", "[]")
     r = llm.invoke(f"{PROMPT_ASISTENTE}\n\nHistorial de la conversacion: {historial}\n"
