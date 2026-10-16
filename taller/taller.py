@@ -344,9 +344,9 @@ for nodo_final in ("receta", "pedido", "horarios", "ofertas", "conversar"):
 app = grafo.compile()
 
 
-def ejecutar_consulta(consulta: str):
+def ejecutar_consulta(consulta: str, origen="py"):
     """Ejecuta una consulta, muestra la respuesta y registra el resultado."""
-    return ejecutar_y_registrar(consulta)
+    return ejecutar_y_registrar(consulta, origen=origen)
 
 
 def registrar_log(
@@ -355,6 +355,7 @@ def registrar_log(
     resultado,
     inicio,
     fin,
+    origen,
     ruta_esperada=None,
     error=None,
 ):
@@ -365,6 +366,7 @@ def registrar_log(
         "fin_santiago": fin.isoformat(),
         "zona_horaria": "America/Santiago",
         "duracion_segundos": round((fin - inicio).total_seconds(), 3),
+        "origen": origen,
         "ejemplo": nombre,
         "consulta": consulta,
         "ruta_obtenida": ruta_obtenida,
@@ -374,13 +376,22 @@ def registrar_log(
     }
     if error:
         registro["error"] = error
-    ruta_log = Path(os.environ.get("LOG_FILE", "taller/ejecuciones.log"))
+    nombre_log = {
+        "py": "ejecuciones_py.log",
+        "ipynb": "ejecuciones_ipynb.log",
+    }.get(origen, f"ejecuciones_{origen}.log")
+    ruta_log = Path("taller") / nombre_log
     ruta_log.parent.mkdir(parents=True, exist_ok=True)
     with ruta_log.open("a", encoding="utf-8") as archivo:
         archivo.write(json.dumps(registro, ensure_ascii=False) + "\n")
 
 
-def ejecutar_y_registrar(consulta: str, nombre="consulta", ruta_esperada=None):
+def ejecutar_y_registrar(
+    consulta: str,
+    nombre="consulta",
+    ruta_esperada=None,
+    origen="py",
+):
     """Crea el estado inicial, recorre el grafo, muestra y registra la respuesta."""
     consulta = consulta.strip()
     if not consulta:
@@ -397,16 +408,17 @@ def ejecutar_y_registrar(consulta: str, nombre="consulta", ruta_esperada=None):
             {},
             inicio,
             fin,
+            origen,
             ruta_esperada,
             error=repr(error),
         )
         raise
     fin = datetime.now(ZONA_HORARIA)
-    registrar_log(nombre, consulta, resultado, inicio, fin, ruta_esperada)
+    registrar_log(nombre, consulta, resultado, inicio, fin, origen, ruta_esperada)
     return resultado
 
 
-def ejecutar_ejemplos():
+def ejecutar_ejemplos(origen="py"):
     """Ejecuta automáticamente los cinco casos de prueba documentados."""
     resultados = {}
     for nombre, ejemplo in EJEMPLOS_PRUEBA.items():
@@ -416,6 +428,7 @@ def ejecutar_ejemplos():
             ejemplo["entrada"],
             nombre=nombre,
             ruta_esperada=ejemplo["ruta_esperada"],
+            origen=origen,
         )
         resultados[nombre] = resultado
         ruta = resultado.get("ruta")

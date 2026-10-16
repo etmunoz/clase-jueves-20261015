@@ -2,3 +2,6 @@
 .env
 __pycache__/
 *.py[cod]
+taller/ejecuciones.log
+taller/ejecuciones_py.log
+taller/ejecuciones_ipynb.log
