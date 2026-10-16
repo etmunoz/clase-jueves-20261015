@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 21:59
+Última modificación: 2026-10-15 22:07
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -97,12 +97,12 @@ LOGS
 ----
 Las ejecuciones del .py se guardan en taller/ejecuciones_py.log.
 Las ejecuciones del notebook se guardan en taller/ejecuciones_ipynb.log.
-Cada línea JSON registra inicio, fin, duración, ruta y respuesta.
+Cada bloque registra modo, inicio, fin, duración, ruta y respuesta.
 """
     )
 
 
-if "--ayuda" in sys.argv:
+if "--ayuda" in sys.argv or "-ayuda" in sys.argv:
     mostrar_ayuda()
     raise SystemExit(0)
 
@@ -538,7 +538,10 @@ def ejecutar_interactivo():
             consulta = input("Escribe tu consulta: ").strip()
             nombre = "interactivo_libre"
         elif opcion in opciones:
-            nombre, consulta = opciones[opcion]
+            nombre, ejemplo = opciones[opcion]
+            consulta = input(
+                f"Escribe tu consulta (Enter usa el ejemplo: {ejemplo}): "
+            ).strip() or ejemplo
         else:
             print("Opción no válida. Elige un número del 0 al 6.")
             continue
