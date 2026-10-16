@@ -33,6 +33,7 @@ El taller sigue el mismo patrón de los agentes del directorio `src/`:
 - [x] `plan.json` creado.
 - [x] Carpeta `.opencode/` creada.
 - [x] `taller/taller.ipynb` generado a partir de `taller.py`.
+- [x] Notebook configurado con el kernel existente `clase-jueves-20261015`.
 - [ ] Ejecutar `Kernel → Restart and Run All` en el notebook/plataforma.
 - [ ] Probar las cinco consultas de `plan.json` y revisar el diagrama.
 - [ ] Crear el ZIP final con `taller.py`, `plan.json` y `.opencode/`.
