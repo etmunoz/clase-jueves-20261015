@@ -36,6 +36,7 @@ llm = ChatGoogleGenerativeAI(model=os.environ.get("GEMINI_FLASH_LITE_MODEL", "ge
 
 # %%
 # ═══════════════════════ ENTREGA · OBLIGATORIO PARA LA EVALUACIÓN ═══════════════════════
+# EQUIPO: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # 1. Escribe los nombres REALES de los integrantes del equipo.
 # 2. Pega aquí tus prompts finales. En el notebook NO existen las variables de la pestaña Prompts
 #    de la plataforma: si los dejas vacíos, el agente no rutea ni cocina y la evaluación falla.
