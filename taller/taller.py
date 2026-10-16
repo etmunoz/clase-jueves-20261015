@@ -77,15 +77,13 @@ El programa atiende cinco flujos mediante LangGraph:
 FORMAS DE EJECUCIÓN
 --------------------
 
-1) Modo interactivo (predeterminado):
-   python taller/taller.py
+1) Modo interactivo:
+   python taller/taller.py --consulta
    Abre un menú con opciones del 1 al 6 y permite varias consultas.
    Elige 0 para salir.
 
 2) Modo automático: ejecuta los cinco ejemplos:
-   PowerShell:
-   $env:MODO = "automatico"
-   python taller/taller.py
+   python taller/taller.py --automatico
 
 3) Una consulta específica, sin menú:
    PowerShell:
@@ -114,6 +112,10 @@ Cada línea JSON registra inicio, fin, duración, ruta y respuesta.
 if "--ayuda" in sys.argv:
     mostrar_ayuda()
     raise SystemExit(0)
+
+if "--consulta" in sys.argv and "--automatico" in sys.argv:
+    print("Usa solo uno de los modos: --consulta o --automatico.")
+    raise SystemExit(2)
 
 ZONA_HORARIA = ZoneInfo("America/Santiago")
 
@@ -569,12 +571,12 @@ EJEMPLOS_PRUEBA = {
 
 # %%
 # PASO 11 · EJECUCIÓN.
-# MODO=automatico ejecuta los cinco casos; MODO=interactivo abre el menú.
-# MODO=consulta ejecuta una sola entrada tomada de USER_INPUT.
+# --consulta abre el menú; --automatico ejecuta los cinco casos.
+# MODO se mantiene como alternativa para ejecutar desde otros entornos.
 modo = os.environ.get("MODO", "interactivo").lower()
-if modo in ("automatico", "ejemplos"):
+if "--automatico" in sys.argv or modo in ("automatico", "ejemplos"):
     final = ejecutar_ejemplos()
-elif modo == "interactivo":
+elif "--consulta" in sys.argv or modo == "interactivo":
     final = ejecutar_interactivo()
 else:
     user_input = os.environ.get("USER_INPUT", "hola, que sabes hacer?")
