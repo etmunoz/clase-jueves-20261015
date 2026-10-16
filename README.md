@@ -92,14 +92,6 @@ ruta esperada:
 python taller/taller.py --automatico
 ```
 
-### Consulta única
-
-```powershell
-$env:MODO = "consulta"
-$env:USER_INPUT = "¿Cuál es el estado del pedido 1042?"
-python taller/taller.py
-```
-
 ## Uso con `taller.ipynb`
 
 Abre `taller/taller.ipynb` usando el kernel:

@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 21:53
+Última modificación: 2026-10-15 21:57
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -85,13 +85,7 @@ FORMAS DE EJECUCIÓN
 2) Modo automático: ejecuta los cinco ejemplos:
    python taller/taller.py --automatico
 
-3) Una consulta específica, sin menú:
-   PowerShell:
-   $env:MODO = "consulta"
-   $env:USER_INPUT = "¿Cuál es el estado del pedido 1042?"
-   python taller/taller.py
-
-4) Ayuda:
+3) Ayuda:
    python taller/taller.py --ayuda
 
 NOTEBOOK
@@ -572,12 +566,10 @@ EJEMPLOS_PRUEBA = {
 # %%
 # PASO 11 · EJECUCIÓN.
 # --consulta abre el menú; --automatico ejecuta los cinco casos.
-# MODO se mantiene como alternativa para ejecutar desde otros entornos.
-modo = os.environ.get("MODO", "interactivo").lower()
-if "--automatico" in sys.argv or modo in ("automatico", "ejemplos"):
+if "--automatico" in sys.argv:
     final = ejecutar_ejemplos()
-elif "--consulta" in sys.argv or modo == "interactivo":
+elif "--consulta" in sys.argv:
     final = ejecutar_interactivo()
 else:
-    user_input = os.environ.get("USER_INPUT", "hola, que sabes hacer?")
-    final = ejecutar_consulta(user_input, origen="py")
+    print("Debes indicar un modo: --consulta, --automatico o --ayuda.")
+    raise SystemExit(2)
