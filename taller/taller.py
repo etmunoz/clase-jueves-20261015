@@ -19,9 +19,10 @@ import os
 import re
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import TypedDict, Literal
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -35,6 +36,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 load_dotenv()
+ZONA_HORARIA = ZoneInfo("America/Santiago")
 
 # Ejecutor local: el proyecto usa directamente el entorno virtual.
 def texto(respuesta):
@@ -326,8 +328,9 @@ def registrar_log(
     """Añade una ejecución al log JSONL sin sobrescribir ejecuciones anteriores."""
     ruta_obtenida = resultado.get("ruta", "")
     registro = {
-        "inicio_utc": inicio.isoformat(),
-        "fin_utc": fin.isoformat(),
+        "inicio_santiago": inicio.isoformat(),
+        "fin_santiago": fin.isoformat(),
+        "zona_horaria": "America/Santiago",
         "duracion_segundos": round((fin - inicio).total_seconds(), 3),
         "ejemplo": nombre,
         "consulta": consulta,
@@ -349,12 +352,12 @@ def ejecutar_y_registrar(consulta: str, nombre="consulta", ruta_esperada=None):
     consulta = consulta.strip()
     if not consulta:
         raise ValueError("La consulta no puede estar vacía.")
-    inicio = datetime.now(timezone.utc)
+    inicio = datetime.now(ZONA_HORARIA)
     inicial = {"entrada": consulta, "ruta": "", "respuesta": ""}
     try:
         resultado = trazar(app, inicial, responder_desde="respuesta")
     except Exception as error:
-        fin = datetime.now(timezone.utc)
+        fin = datetime.now(ZONA_HORARIA)
         registrar_log(
             nombre,
             consulta,
@@ -365,7 +368,7 @@ def ejecutar_y_registrar(consulta: str, nombre="consulta", ruta_esperada=None):
             error=repr(error),
         )
         raise
-    fin = datetime.now(timezone.utc)
+    fin = datetime.now(ZONA_HORARIA)
     registrar_log(nombre, consulta, resultado, inicio, fin, ruta_esperada)
     return resultado
 
