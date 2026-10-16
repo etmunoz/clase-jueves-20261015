@@ -1,4 +1,9 @@
-"""TALLER · Generador de Recetas para el ecommerce "EcoMarket".
+"""Archivo: taller.py
+Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
+Fecha de creación: 2026-10-15 21:08
+Última modificación: 2026-10-15 21:49
+
+TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
 Tu agente atiende clientes del supermercado por chat. Debe saber:
   1. Recomendar RECETAS con productos de la tienda (tools simuladas)
