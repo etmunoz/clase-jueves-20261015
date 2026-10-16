@@ -45,8 +45,9 @@ El menú interactivo permite elegir recetas, pedidos, horarios, conversación,
 ofertas o una consulta libre, y continuar atendiendo consultas hasta elegir
 `0. Salir`.
 
-La opción 4 mantiene un loop conversacional. Escribe varios mensajes y usa
-`/volver` para regresar al menú principal.
+La opción 4 mantiene un loop conversacional. El modo `--consulta` entra
+directamente al chat; escribe `/opciones` para ver el menú estructurado y
+`/salir` para terminar.
 
 La opción 7 imprime el Mermaid en pantalla mediante
 `app.get_graph().draw_mermaid()` y genera `grafo_ecomarket.png` en la raíz
