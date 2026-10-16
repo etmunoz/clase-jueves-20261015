@@ -436,6 +436,44 @@ def ejecutar_ejemplos(origen="py"):
         print(f"Ruta obtenida: {ruta} | Ruta esperada: {esperada}")
     return resultados
 
+
+def ejecutar_interactivo():
+    """Muestra un menú y permite atender varias consultas desde la terminal."""
+    opciones = {
+        "1": ("recetas", EJEMPLOS_PRUEBA["recetas"]["entrada"]),
+        "2": ("pedido", EJEMPLOS_PRUEBA["pedido"]["entrada"]),
+        "3": ("horarios", EJEMPLOS_PRUEBA["horarios"]["entrada"]),
+        "4": ("conversar", EJEMPLOS_PRUEBA["conversar"]["entrada"]),
+        "5": ("ofertas_bonus", EJEMPLOS_PRUEBA["ofertas_bonus"]["entrada"]),
+    }
+    print("\n=== EcoMarket · modo interactivo ===")
+    print("Selecciona una opción y escribe tu consulta.")
+    while True:
+        print("\n1. Recomendar recetas")
+        print("2. Consultar estado de pedido")
+        print("3. Consultar horarios de despacho")
+        print("4. Conversar con el asistente")
+        print("5. Consultar ofertas")
+        print("6. Escribir una consulta libre")
+        print("0. Salir")
+        try:
+            opcion = input("Opción: ").strip()
+        except EOFError:
+            print("\nEntrada finalizada.")
+            break
+        if opcion == "0":
+            print("Hasta luego.")
+            break
+        if opcion == "6":
+            consulta = input("Escribe tu consulta: ").strip()
+            nombre = "interactivo_libre"
+        elif opcion in opciones:
+            nombre, consulta = opciones[opcion]
+        else:
+            print("Opción no válida. Elige un número del 0 al 6.")
+            continue
+        ejecutar_y_registrar(consulta, nombre=f"interactivo_{nombre}", origen="py")
+
 # ═══════════════ EJEMPLOS DE PRUEBA ═════════════════════════════════════════
 # Copia cualquiera de estas entradas en USER_INPUT para probar cada flujo.
 EJEMPLOS_PRUEBA = {
@@ -473,14 +511,14 @@ EJEMPLOS_PRUEBA = {
 #   4. su entrada en add_conditional_edges + add_edge al END
 
 # %%
-# PASO 11 · EJECUCIÓN AUTOMÁTICA.
-# MODO=consulta ejecuta una entrada; MODO=ejemplos ejecuta los cinco casos.
-modo = os.environ.get("MODO", "consulta").lower()
-if modo == "ejemplos":
+# PASO 11 · EJECUCIÓN.
+# MODO=automatico ejecuta los cinco casos; MODO=interactivo abre el menú.
+# MODO=consulta ejecuta una sola entrada tomada de USER_INPUT.
+modo = os.environ.get("MODO", "interactivo").lower()
+if modo in ("automatico", "ejemplos"):
     final = ejecutar_ejemplos()
+elif modo == "interactivo":
+    final = ejecutar_interactivo()
 else:
-    try:
-        user_input = os.environ.get("USER_INPUT") or input("Escribe tu consulta para EcoMarket: ")
-    except EOFError:
-        user_input = "hola, que sabes hacer?"
-    final = ejecutar_consulta(user_input)
+    user_input = os.environ.get("USER_INPUT", "hola, que sabes hacer?")
+    final = ejecutar_consulta(user_input, origen="py")

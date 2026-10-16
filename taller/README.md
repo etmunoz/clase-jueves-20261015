@@ -30,6 +30,26 @@ MODO = "consulta"   # una sola consulta
 MODO = "ejemplos"   # ejecuta los cinco casos automáticamente
 ```
 
+Para ejecutar el archivo Python:
+
+```powershell
+# Menú interactivo (modo predeterminado)
+python taller/taller.py
+
+# Ejecuta automáticamente los cinco ejemplos
+$env:MODO = "automatico"
+python taller/taller.py
+
+# Ejecuta una única consulta sin menú
+$env:MODO = "consulta"
+$env:USER_INPUT = "¿Cuál es el estado del pedido 1042?"
+python taller/taller.py
+```
+
+El menú interactivo permite elegir recetas, pedidos, horarios, conversación,
+ofertas o una consulta libre, y continuar atendiendo consultas hasta elegir
+`0. Salir`.
+
 Cada ejecución se agrega como una línea JSON con
 `inicio_santiago`, `fin_santiago`, `zona_horaria`, `duracion_segundos`,
 consulta, ruta, resultado de la clasificación y respuesta. Si falla, también
