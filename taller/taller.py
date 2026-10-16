@@ -14,6 +14,22 @@ COMO TRABAJAR (detalle completo en la pestana Docs):
   D. Prueba cada flujo con la pestana Preguntas y mira el diagrama.
   E. Entrega: un .zip con el notebook (nombres de integrantes, prompts pegados en la celda
      ENTREGA y TODO el codigo corriendo), mas plan.json y la carpeta .opencode/.
+
+FLUJO IMPLEMENTADO
+===================
+START
+  ↓
+router (clasifica con salida estructurada Ruta)
+  ├── receta    → buscar_recetas + productos_y_precios → respuesta → END
+  ├── pedido    → extraer número + estado_pedido → respuesta → END
+  ├── horarios  → horarios_despacho → respuesta → END
+  ├── ofertas   → ofertas_semana → respuesta → END  [BONUS]
+  └── conversar → historial + LLM → respuesta → END
+
+El router nunca responde el contenido por sí mismo: solo decide la ruta.
+Cada nodo especializado usa la información verificada por sus tools antes de
+redactar la respuesta. La ejecución automática puede procesar una consulta o
+los cinco ejemplos y registra cada resultado en taller/ejecuciones.log.
 """
 import os
 import re
@@ -292,6 +308,17 @@ def ofertas(estado: Estado):
 # %%
 # PASO 10 · GRAFO: router → un nodo especializado → END.
 # ═══════════════ EL GRAFO (ya cableado) ════════════════════════════════════
+FLUJO_GRAFO = """Flujo del grafo:
+
+    START -> router -> receta    -> END
+                   -> pedido    -> END
+                   -> horarios  -> END
+                   -> ofertas   -> END
+                   -> conversar -> END
+
+La arista condicional usa el valor estructurado ``ruta`` para activar una y
+solo una rama por consulta.
+"""
 grafo = StateGraph(Estado)
 grafo.add_node("router", router)
 grafo.add_node("receta", receta)
