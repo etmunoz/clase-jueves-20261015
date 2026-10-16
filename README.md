@@ -44,11 +44,47 @@ Flujo bonus que consulta promociones simuladas de EcoMarket.
 
 ## Preparación
 
-Desde la raíz del proyecto:
+Desde la raíz del proyecto, instala las dependencias con `uv`:
+
+```bash
+uv sync
+```
+
+Después activa el entorno virtual usando el script correspondiente a tu
+sistema operativo. Todos los comandos siguientes deben ejecutarse desde la
+raíz del proyecto.
+
+### Activación por sistema operativo
+
+**Windows PowerShell** (el punto inicial conserva la activación en la sesión):
 
 ```powershell
-.venv\Scripts\Activate.ps1
+. .\scripts\activar_windows.ps1
 ```
+
+**Windows CMD**:
+
+```bat
+scripts\activar_windows.bat
+```
+
+**macOS/Linux** (usa `source` para conservar la activación en la sesión):
+
+```bash
+source scripts/activar_macos_linux.sh
+```
+
+También puedes ejecutar comandos sin activar manualmente el entorno:
+
+```bash
+uv run python taller/taller.py --consulta
+```
+
+Los scripts disponibles son:
+
+- `scripts/activar_windows.ps1`: PowerShell.
+- `scripts/activar_windows.bat`: CMD.
+- `scripts/activar_macos_linux.sh`: macOS y Linux.
 
 Configura `.env`:
 
