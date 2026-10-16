@@ -93,7 +93,7 @@ FORMAS DE EJECUCIÓN
    python taller/taller.py --consulta
    Abre un menú con opciones del 1 al 7 y permite varias consultas.
    En la opción 4, escribe /volver para regresar al menú.
-   La opción 7 genera grafo_ecomarket.png en la raíz del proyecto.
+   La opción 7 imprime Mermaid en pantalla y genera grafo_ecomarket.png.
    Elige 0 para salir.
 
 2) Modo automático: ejecuta los cinco ejemplos:
@@ -461,7 +461,7 @@ def ejecutar_grafo_texto(consulta: str, origen="py", modo="consulta"):
 
 
 def ejecutar_grafo_png():
-    """Genera el PNG oficial del grafo en la raíz del proyecto."""
+    """Imprime Mermaid y genera el PNG oficial en la raíz del proyecto."""
     inicio = datetime.now(ZONA_HORARIA)
     try:
         try:
@@ -469,8 +469,11 @@ def ejecutar_grafo_png():
         except NameError:
             raiz = Path.cwd()
         destino = raiz / "grafo_ecomarket.png"
+        mermaid = app.get_graph().draw_mermaid()
+        print("\n📐 Mermaid del grafo:\n")
+        print(mermaid)
         destino.write_bytes(app.get_graph().draw_mermaid_png())
-        respuesta = f"PNG generado en: {destino}"
+        respuesta = f"Mermaid mostrado en pantalla y PNG generado en: {destino}"
         print(f"\n🖼️ {respuesta}")
         resultado = {"ruta": "grafo_png", "respuesta": respuesta}
         error = None
@@ -617,7 +620,7 @@ def ejecutar_interactivo():
         print("4. Conversar con el asistente")
         print("5. Consultar ofertas")
         print("6. Escribir una consulta libre")
-        print("7. Generar PNG del grafo en la raíz del proyecto")
+        print("7. Mostrar Mermaid y generar PNG del grafo")
         print("0. Salir")
         try:
             opcion = input("Opción: ").strip()
