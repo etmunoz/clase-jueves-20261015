@@ -1,0 +1,62 @@
+{
+  "titulo": "Taller EcoMarket: router de atención y flujos especializados",
+  "equipo": [
+    "Fabio Durán",
+    "Gustavo Reyes",
+    "Ezequiel Muñoz"
+  ],
+  "objetivo": "Completar un agente LangGraph que atienda recetas, pedidos, horarios, conversación y ofertas simuladas.",
+  "archivo_principal": "taller/taller.py",
+  "arquitectura": {
+    "patron": "router -> nodo especializado -> END",
+    "estado": ["entrada", "ruta", "respuesta"],
+    "router": "Salida estructurada Ruta con los destinos receta, pedido, horarios, ofertas o conversar.",
+    "herramientas": "Las tools consultan únicamente los datos simulados del taller; los nodos usan sus resultados antes de redactar."
+  },
+  "flujos": [
+    {
+      "nombre": "receta",
+      "entrada": "Ingrediente, plato o pedido de cocina",
+      "tools": ["buscar_recetas", "productos_y_precios"],
+      "salida": "Receta, ingredientes, tiempo, precios y enlace disponible"
+    },
+    {
+      "nombre": "pedido",
+      "entrada": "Mensaje que contiene un número de pedido",
+      "tools": ["estado_pedido"],
+      "salida": "Estado verificado y detalle del pedido"
+    },
+    {
+      "nombre": "horarios",
+      "entrada": "Consulta de despacho y comuna",
+      "tools": ["horarios_despacho"],
+      "salida": "Horario de despacho verificado"
+    },
+    {
+      "nombre": "conversar",
+      "entrada": "Saludo, pregunta general o caso no especializado",
+      "tools": [],
+      "salida": "Respuesta conversacional con historial"
+    },
+    {
+      "nombre": "ofertas",
+      "entrada": "Consulta de promociones o descuentos",
+      "tools": ["ofertas_semana"],
+      "salida": "Promociones simuladas vigentes"
+    }
+  ],
+  "pruebas_recomendadas": [
+    "Quiero una receta con palta",
+    "¿Dónde está mi pedido 1042?",
+    "¿Cuáles son los horarios de despacho en Providencia?",
+    "¿Qué ofertas tienen esta semana?",
+    "Hola, ¿qué sabes hacer?"
+  ],
+  "entrega": [
+    "taller/taller.py con nombres, prompts y TODO 1, TODO 2, TODO 3 completos",
+    "taller/taller.ipynb con el código completo en una celda ejecutable",
+    "plan.json",
+    ".opencode/spec.md",
+    ".opencode/implementador.md"
+  ]
+}
