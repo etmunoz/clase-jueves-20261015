@@ -297,6 +297,31 @@ for nodo_final in ("receta", "pedido", "horarios", "ofertas", "conversar"):
 
 app = grafo.compile()
 
+# ═══════════════ EJEMPLOS DE PRUEBA ═════════════════════════════════════════
+# Copia cualquiera de estas entradas en USER_INPUT para probar cada flujo.
+EJEMPLOS_PRUEBA = {
+    "recetas": {
+        "entrada": "Quiero una receta con palta y tomate",
+        "ruta_esperada": "receta",
+    },
+    "pedido": {
+        "entrada": "¿Cuál es el estado de mi pedido 1042?",
+        "ruta_esperada": "pedido",
+    },
+    "horarios": {
+        "entrada": "¿Cuáles son los horarios de despacho en Providencia?",
+        "ruta_esperada": "horarios",
+    },
+    "conversar": {
+        "entrada": "Hola, ¿qué sabes hacer?",
+        "ruta_esperada": "conversar",
+    },
+    "ofertas_bonus": {
+        "entrada": "¿Qué promociones tienen esta semana?",
+        "ruta_esperada": "ofertas",
+    },
+}
+
 # El mapa estático oficial de LangGraph, como imagen en el chat:
 #print(app.get_graph().draw_mermaid_png())
 

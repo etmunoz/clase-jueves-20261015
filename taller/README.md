@@ -21,3 +21,5 @@ En `taller.ipynb`, escribe la consulta en la segunda celda, en la variable
 ```python
 USER_INPUT = "¿Qué recetas tienen palta?"
 ```
+
+La tercera celda imprime los cinco ejemplos disponibles y sus rutas esperadas.
