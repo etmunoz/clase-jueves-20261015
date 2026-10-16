@@ -107,11 +107,12 @@ Abre `taller/taller.ipynb` usando el kernel:
 Python 3.12 (.venv) clase-jueves-20261015
 ```
 
-El notebook tiene tres celdas:
+El notebook tiene cuatro celdas:
 
 1. **Configuración:** define tools, estado, nodos y grafo.
-2. **Ejemplos:** muestra las consultas disponibles y sus rutas esperadas.
-3. **Ejecución:** permite elegir entre una consulta o todos los ejemplos.
+2. **Diagrama Mermaid:** genera el gráfico oficial con `app.get_graph().draw_mermaid()`.
+3. **Ejemplos:** muestra las consultas disponibles y sus rutas esperadas.
+4. **Ejecución:** permite elegir entre una consulta o todos los ejemplos.
 
 Para una consulta individual, edita la tercera celda:
 

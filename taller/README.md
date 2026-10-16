@@ -22,8 +22,9 @@ En `taller.ipynb`, escribe la consulta en la segunda celda, en la variable
 USER_INPUT = "¿Qué recetas tienen palta?"
 ```
 
-La segunda celda imprime los cinco ejemplos disponibles y sus rutas esperadas.
-En la tercera celda puedes elegir:
+La segunda celda genera el diagrama Mermaid oficial con
+`app.get_graph().draw_mermaid()`. La tercera celda imprime los cinco ejemplos
+disponibles y sus rutas esperadas. En la cuarta celda puedes elegir:
 
 ```python
 MODO = "consulta"   # una sola consulta
