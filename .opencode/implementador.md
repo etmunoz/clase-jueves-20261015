@@ -56,7 +56,6 @@ usa los datos de la tool correspondiente.
 
 ## Nota sobre la plataforma
 
-El archivo usa `plataforma` para `chat`, `texto` y `trazar` cuando está
-disponible. Fuera de la plataforma incluye un fallback local para `texto` y
-`trazar`, por lo que el notebook no falla con `ModuleNotFoundError`; en ambos
-casos se necesita `GOOGLE_API_KEY` configurada en el panel o en `.env`.
+El archivo usa implementaciones locales de `texto` y `trazar`, por lo que no
+depende del módulo privado `plataforma` y el notebook puede ejecutarse con el
+`.venv` del proyecto. Se necesita `GOOGLE_API_KEY` configurada en `.env`.

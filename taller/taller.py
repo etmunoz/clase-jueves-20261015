@@ -28,33 +28,29 @@ from langgraph.graph import StateGraph, START, END
 
 load_dotenv()
 
-try:
-    # Disponible dentro de la plataforma oficial del taller.
-    from plataforma import chat, texto, trazar
-except ModuleNotFoundError:
-    # Fallback local para ejecutar el .py o el notebook fuera de la plataforma.
-    chat = None
+# Ejecutor local: el proyecto usa el entorno virtual y no depende de
+# `plataforma`, que solo existe en el entorno privado del taller.
+def texto(respuesta):
+    """Convierte una respuesta de LangChain en texto imprimible."""
+    contenido = getattr(respuesta, "content", respuesta)
+    if isinstance(contenido, str):
+        return contenido
+    if isinstance(contenido, list):
+        return "".join(
+            str(bloque.get("text", ""))
+            if isinstance(bloque, dict)
+            else str(bloque)
+            for bloque in contenido
+        )
+    return str(contenido)
 
-    def texto(respuesta):
-        """Convierte una respuesta de LangChain en texto imprimible."""
-        contenido = getattr(respuesta, "content", respuesta)
-        if isinstance(contenido, str):
-            return contenido
-        if isinstance(contenido, list):
-            return "".join(
-                str(bloque.get("text", ""))
-                if isinstance(bloque, dict)
-                else str(bloque)
-                for bloque in contenido
-            )
-        return str(contenido)
 
-    def trazar(app, inicial, responder_desde="respuesta"):
-        """Ejecutor local equivalente al trazador de la plataforma."""
-        final = app.invoke(inicial)
-        print(f"[local] ruta: {final.get('ruta', '')}")
-        print(final.get(responder_desde, ""))
-        return final
+def trazar(app, inicial, responder_desde="respuesta"):
+    """Ejecuta el grafo localmente y muestra su respuesta final."""
+    final = app.invoke(inicial)
+    print(f"[local] ruta: {final.get('ruta', '')}")
+    print(final.get(responder_desde, ""))
+    return final
 
 # ── La key viene del panel API keys (o backend/.env) — NUNCA del código ────
 if not os.environ.get("GOOGLE_API_KEY"):
