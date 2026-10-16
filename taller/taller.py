@@ -51,14 +51,14 @@ def trazar(app, inicial, responder_desde="respuesta"):
     print(final.get(responder_desde, ""))
     return final
 
-# ── La key viene del panel API keys (o backend/.env) — NUNCA del código ────
+# PASO 1 · CONFIGURACIÓN: la key viene de .env — NUNCA del código.
 if not os.environ.get("GOOGLE_API_KEY"):
     print(" Falta **GOOGLE_API_KEY**. Agrégala en el panel *API keys* y vuelve a ejecutar.")
     raise SystemExit(0)
 
 llm = ChatGoogleGenerativeAI(model=os.environ.get("GEMINI_FLASH_LITE_MODEL", "gemini-flash-lite-latest"))
 
-# %%
+# PASO 2 · ENTREGA: integrantes y prompts finales.
 # ═══════════════════════ ENTREGA · OBLIGATORIO PARA LA EVALUACIÓN ═══════════════════════
 # EQUIPO: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # 1. Escribe los nombres REALES de los integrantes del equipo.
@@ -108,7 +108,7 @@ else:
 os.environ["CHAT_HISTORY"] = "[]"
 
 
-# %%
+# PASO 3 · DATOS: catálogo, pedidos, horarios y ofertas simulados.
 # ═══════════════ DATOS SIMULADOS DE ECOMARKET (no los edites) ══════════════
 RECETAS = [
     {"nombre": "Pasta al pesto con palta", "url": "https://recetas.ecomarket.cl/pasta-pesto-palta",
@@ -142,7 +142,7 @@ OFERTAS = [
     {"nombre": "Envío gratis sobre $25.000", "descuento": "costo de despacho $0", "vigencia": "lunes a viernes"},
 ]
 
-# %%
+# PASO 4 · TOOLS: funciones que consultan los datos simulados.
 # ═══════════════ TOOLS (ya listas: solo tienes que USARLAS) ════════════════
 @tool
 def buscar_recetas(ingrediente: str) -> str:
@@ -184,7 +184,7 @@ def ofertas_semana() -> str:
         for oferta in OFERTAS
     )
 
-# %%
+# PASO 5 · ESTADO Y ROUTER: clasificación estructurada de la intención.
 # ═══════════════ ESTADO Y ROUTER (ya listos) ═══════════════════════════════
 class Estado(TypedDict):
     entrada: str
@@ -202,7 +202,7 @@ def router(estado: Estado):
     print(f"[router] ruta: {d}")
     return {"ruta": d}
 
-# %%
+# PASO 6 · NODOS: cada nodo atiende una responsabilidad.
 # ═══════════════ NODO MODELO (LISTO) — imita este patron ═══════════════════
 def conversar(estado: Estado):
     """FLUJO CONVERSACIONAL: responde con memoria del chat.
@@ -214,7 +214,7 @@ def conversar(estado: Estado):
                    f"Cliente: {estado['entrada']}")
     return {"respuesta": texto(r)} # Ejemplo del TODO 4
 
-# %%
+# PASO 7 · FLUJO DE RECETAS: tools + modelo.
 # ═══════════════ TODO 1 · FLUJO DE RECETAS ═════════════════════════════════
 def receta(estado: Estado):
     """Recomienda una receta con productos y precios de la tienda.
@@ -233,6 +233,7 @@ def receta(estado: Estado):
     )
     return {"respuesta": texto(llm.invoke(prompt))}
 
+# PASO 8 · FLUJO DE PEDIDOS: extraer número + tool + respuesta.
 # ═══════════════ TODO 2 · FLUJO ESTADO DE PEDIDOS ══════════════════════════
 def pedido(estado: Estado):
     """Informa el estado de un pedido.
@@ -253,6 +254,7 @@ def pedido(estado: Estado):
     )
     return {"respuesta": texto(llm.invoke(prompt))}
 
+# PASO 9 · FLUJO DE HORARIOS: tool + respuesta.
 # ═══════════════ TODO 3 · FLUJO DE HORARIOS ════════════════════════════════
 def horarios(estado: Estado):
     """Responde horarios de despacho de la comuna que mencione el cliente.
@@ -278,6 +280,7 @@ def ofertas(estado: Estado):
     return {"respuesta": texto(llm.invoke(prompt))}
 
 # %%
+# PASO 10 · GRAFO: router → un nodo especializado → END.
 # ═══════════════ EL GRAFO (ya cableado) ════════════════════════════════════
 grafo = StateGraph(Estado)
 grafo.add_node("router", router)
@@ -296,6 +299,29 @@ for nodo_final in ("receta", "pedido", "horarios", "ofertas", "conversar"):
     grafo.add_edge(nodo_final, END)
 
 app = grafo.compile()
+
+
+def ejecutar_consulta(consulta: str):
+    """Ejecuta una consulta: crea el estado inicial, recorre el grafo y muestra la respuesta."""
+    consulta = consulta.strip()
+    if not consulta:
+        raise ValueError("La consulta no puede estar vacía.")
+    inicial = {"entrada": consulta, "ruta": "", "respuesta": ""}
+    return trazar(app, inicial, responder_desde="respuesta")
+
+
+def ejecutar_ejemplos():
+    """Ejecuta automáticamente los cinco casos de prueba documentados."""
+    resultados = {}
+    for nombre, ejemplo in EJEMPLOS_PRUEBA.items():
+        print(f"\n=== EJEMPLO: {nombre} ===")
+        print(f"Consulta: {ejemplo['entrada']}")
+        resultado = ejecutar_consulta(ejemplo["entrada"])
+        resultados[nombre] = resultado
+        ruta = resultado.get("ruta")
+        esperada = ejemplo["ruta_esperada"]
+        print(f"Ruta obtenida: {ruta} | Ruta esperada: {esperada}")
+    return resultados
 
 # ═══════════════ EJEMPLOS DE PRUEBA ═════════════════════════════════════════
 # Copia cualquiera de estas entradas en USER_INPUT para probar cada flujo.
@@ -334,13 +360,14 @@ EJEMPLOS_PRUEBA = {
 #   4. su entrada en add_conditional_edges + add_edge al END
 
 # %%
-# ═══════════════ EJECUCION ═════════════════════════════════════════════════
-# En el notebook puedes escribir la consulta cuando aparezca el cuadro de entrada.
-try:
-    user_input = os.environ.get("USER_INPUT") or input("Escribe tu consulta para EcoMarket: ")
-except EOFError:
-    # Permite ejecutar el notebook sin interacción (por ejemplo, en nbconvert).
-    user_input = "hola, que sabes hacer?"
-
-inicial = {"entrada": user_input, "ruta": "", "respuesta": ""}
-final = trazar(app, inicial, responder_desde="respuesta")
+# PASO 11 · EJECUCIÓN AUTOMÁTICA.
+# MODO=consulta ejecuta una entrada; MODO=ejemplos ejecuta los cinco casos.
+modo = os.environ.get("MODO", "consulta").lower()
+if modo == "ejemplos":
+    final = ejecutar_ejemplos()
+else:
+    try:
+        user_input = os.environ.get("USER_INPUT") or input("Escribe tu consulta para EcoMarket: ")
+    except EOFError:
+        user_input = "hola, que sabes hacer?"
+    final = ejecutar_consulta(user_input)
