@@ -310,7 +310,12 @@ app = grafo.compile()
 
 # %%
 # ═══════════════ EJECUCION ═════════════════════════════════════════════════
-user_input = os.environ.get("USER_INPUT", "hola, que sabes hacer?")
+# En el notebook puedes escribir la consulta cuando aparezca el cuadro de entrada.
+try:
+    user_input = os.environ.get("USER_INPUT") or input("Escribe tu consulta para EcoMarket: ")
+except EOFError:
+    # Permite ejecutar el notebook sin interacción (por ejemplo, en nbconvert).
+    user_input = "hola, que sabes hacer?"
 
 inicial = {"entrada": user_input, "ruta": "", "respuesta": ""}
 final = trazar(app, inicial, responder_desde="respuesta")
