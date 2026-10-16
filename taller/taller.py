@@ -17,6 +17,10 @@ COMO TRABAJAR (detalle completo en la pestana Docs):
 """
 import os
 import re
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import TypedDict, Literal
 
 from dotenv import load_dotenv
@@ -25,6 +29,10 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
+
+# PASO 0 · SALIDA: evita errores de caracteres Unicode en Windows.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 load_dotenv()
 
@@ -302,12 +310,64 @@ app = grafo.compile()
 
 
 def ejecutar_consulta(consulta: str):
-    """Ejecuta una consulta: crea el estado inicial, recorre el grafo y muestra la respuesta."""
+    """Ejecuta una consulta, muestra la respuesta y registra el resultado."""
+    return ejecutar_y_registrar(consulta)
+
+
+def registrar_log(
+    nombre,
+    consulta,
+    resultado,
+    inicio,
+    fin,
+    ruta_esperada=None,
+    error=None,
+):
+    """Añade una ejecución al log JSONL sin sobrescribir ejecuciones anteriores."""
+    ruta_obtenida = resultado.get("ruta", "")
+    registro = {
+        "inicio_utc": inicio.isoformat(),
+        "fin_utc": fin.isoformat(),
+        "duracion_segundos": round((fin - inicio).total_seconds(), 3),
+        "ejemplo": nombre,
+        "consulta": consulta,
+        "ruta_obtenida": ruta_obtenida,
+        "ruta_esperada": ruta_esperada,
+        "correcto": ruta_esperada is None or ruta_obtenida == ruta_esperada,
+        "respuesta": resultado.get("respuesta", ""),
+    }
+    if error:
+        registro["error"] = error
+    ruta_log = Path(os.environ.get("LOG_FILE", "taller/ejecuciones.log"))
+    ruta_log.parent.mkdir(parents=True, exist_ok=True)
+    with ruta_log.open("a", encoding="utf-8") as archivo:
+        archivo.write(json.dumps(registro, ensure_ascii=False) + "\n")
+
+
+def ejecutar_y_registrar(consulta: str, nombre="consulta", ruta_esperada=None):
+    """Crea el estado inicial, recorre el grafo, muestra y registra la respuesta."""
     consulta = consulta.strip()
     if not consulta:
         raise ValueError("La consulta no puede estar vacía.")
+    inicio = datetime.now(timezone.utc)
     inicial = {"entrada": consulta, "ruta": "", "respuesta": ""}
-    return trazar(app, inicial, responder_desde="respuesta")
+    try:
+        resultado = trazar(app, inicial, responder_desde="respuesta")
+    except Exception as error:
+        fin = datetime.now(timezone.utc)
+        registrar_log(
+            nombre,
+            consulta,
+            {},
+            inicio,
+            fin,
+            ruta_esperada,
+            error=repr(error),
+        )
+        raise
+    fin = datetime.now(timezone.utc)
+    registrar_log(nombre, consulta, resultado, inicio, fin, ruta_esperada)
+    return resultado
 
 
 def ejecutar_ejemplos():
@@ -316,7 +376,11 @@ def ejecutar_ejemplos():
     for nombre, ejemplo in EJEMPLOS_PRUEBA.items():
         print(f"\n=== EJEMPLO: {nombre} ===")
         print(f"Consulta: {ejemplo['entrada']}")
-        resultado = ejecutar_consulta(ejemplo["entrada"])
+        resultado = ejecutar_y_registrar(
+            ejemplo["entrada"],
+            nombre=nombre,
+            ruta_esperada=ejemplo["ruta_esperada"],
+        )
         resultados[nombre] = resultado
         ruta = resultado.get("ruta")
         esperada = ejemplo["ruta_esperada"]

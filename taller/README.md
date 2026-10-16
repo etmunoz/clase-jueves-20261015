@@ -29,3 +29,8 @@ En la tercera celda puedes elegir:
 MODO = "consulta"   # una sola consulta
 MODO = "ejemplos"   # ejecuta los cinco casos automáticamente
 ```
+
+Cada ejecución se agrega a `taller/ejecuciones.log` como una línea JSON con
+`inicio_utc`, `fin_utc`, `duracion_segundos`, consulta, ruta, resultado de la
+clasificación y respuesta. Si falla, también guarda el error. El archivo está
+excluido de Git porque puede contener consultas de clientes.
