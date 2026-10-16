@@ -124,7 +124,7 @@ kernel antes de ejecutar todo nuevamente.
 
 ## Logs
 
-Cada ejecución registra una línea JSON con:
+Cada ejecución registra un bloque de texto legible con:
 
 - Inicio y fin.
 - Duración.

@@ -2,7 +2,7 @@
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 21:57
+Última modificación: 2026-10-15 21:58
 
 TALLER · Generador de Recetas para el ecommerce "EcoMarket".
 
@@ -39,7 +39,6 @@ los cinco ejemplos y registra cada resultado en taller/ejecuciones.log.
 """
 import os
 import re
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -412,23 +411,36 @@ def registrar_log(
     ruta_esperada=None,
     error=None,
 ):
-    """Añade una ejecución al log JSONL sin sobrescribir ejecuciones anteriores."""
+    """Añade una ejecución al log en formato humano, sin sobrescribir anteriores."""
     ruta_obtenida = resultado.get("ruta", "")
-    registro = {
-        "inicio_santiago": inicio.isoformat(),
-        "fin_santiago": fin.isoformat(),
-        "zona_horaria": "America/Santiago",
-        "duracion_segundos": round((fin - inicio).total_seconds(), 3),
-        "origen": origen,
-        "ejemplo": nombre,
-        "consulta": consulta,
-        "ruta_obtenida": ruta_obtenida,
-        "ruta_esperada": ruta_esperada,
-        "correcto": ruta_esperada is None or ruta_obtenida == ruta_esperada,
-        "respuesta": resultado.get("respuesta", ""),
-    }
+    correcto = ruta_esperada is None or ruta_obtenida == ruta_esperada
+    estado = "✅ correcto" if correcto else "⚠️ revisar ruta"
+    duracion = round((fin - inicio).total_seconds(), 3)
+    separador = "═" * 72
+    lineas = [
+        "",
+        f"╔{separador}╗",
+        "║ 🛒 ECO MARKET · REGISTRO DE EJECUCIÓN",
+        f"║ {estado} · ejemplo: {nombre} · origen: {origen}",
+        f"║ 🕐 Inicio Santiago: {inicio.strftime('%Y-%m-%d %H:%M:%S %z')}",
+        f"║ 🏁 Fin Santiago:    {fin.strftime('%Y-%m-%d %H:%M:%S %z')}",
+        f"║ ⏱️ Duración:         {duracion} segundos",
+        f"║ 🧭 Ruta obtenida:    {ruta_obtenida or '(sin ruta)'}",
+    ]
+    if ruta_esperada:
+        lineas.append(f"║ 🎯 Ruta esperada:    {ruta_esperada}")
+    lineas.extend(
+        [
+            "║",
+            f"║ 💬 Consulta: {consulta}",
+            "║",
+            "║ 🤖 Respuesta:",
+        ]
+    )
+    lineas.extend(f"║   {linea}" for linea in resultado.get("respuesta", "").splitlines())
     if error:
-        registro["error"] = error
+        lineas.extend(["║", f"║ ❌ Error: {error}"])
+    lineas.append(f"╚{separador}╝")
     nombre_log = {
         "py": "ejecuciones_py.log",
         "ipynb": "ejecuciones_ipynb.log",
@@ -436,7 +448,7 @@ def registrar_log(
     ruta_log = Path("taller") / nombre_log
     ruta_log.parent.mkdir(parents=True, exist_ok=True)
     with ruta_log.open("a", encoding="utf-8") as archivo:
-        archivo.write(json.dumps(registro, ensure_ascii=False) + "\n")
+        archivo.write("\n".join(lineas) + "\n")
 
 
 def ejecutar_y_registrar(
