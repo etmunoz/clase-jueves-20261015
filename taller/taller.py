@@ -1,5 +1,6 @@
 """Archivo: taller.py
 Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
+Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
 Fecha de creación: 2026-10-15 21:08
 Última modificación: 2026-10-15 21:49
 
