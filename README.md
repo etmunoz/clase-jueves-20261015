@@ -196,6 +196,22 @@ ejecuta una consulta mediante `USER_INPUT` o ejecuta los cinco ejemplos con
 `MODO = "ejemplos"`; sus resultados se registran en
 `taller/ejecuciones_ipynb.log`.
 
+La ejecución recomendada del notebook es:
+
+1. Ejecutar la celda de configuración una vez; carga `.env`, valida los
+   prompts, define las tools y compila `app`.
+2. Ejecutar la celda de diagrama; obtiene el Mermaid oficial con
+   `app.get_graph().draw_mermaid()` y no llama al modelo.
+3. Ejecutar la celda de ejemplos; solo imprime las entradas y rutas esperadas.
+4. En la celda de ejecución, editar `MODO` y `USER_INPUT`:
+   - `MODO = "consulta"` ejecuta una entrada.
+   - `MODO = "ejemplos"` ejecuta los cinco casos.
+
+El notebook no solicita mensajes con `input()` y no debe recibir los comandos
+del terminal `/opciones`, `/salir`, `/exit` o `/quit`. Cada consulta ejecutada
+desde la cuarta celda usa el mismo router y los mismos nodos del `.py`, pero
+se registra con origen `ipynb`.
+
 Para una consulta individual, edita la cuarta celda:
 
 ```python
