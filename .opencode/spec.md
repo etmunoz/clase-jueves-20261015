@@ -33,6 +33,25 @@ class Estado(TypedDict):
 `Ruta` es la salida estructurada del router y solo permite `receta`, `pedido`,
 `horarios`, `ofertas` y `conversar`.
 
+## Flujo conversacional de terminal
+
+`python taller/taller.py --consulta` inicia directamente el chat, sin mostrar
+el menú. Cada mensaje normal se envía al router y muestra las trazas:
+
+```text
+[router] ruta: <ruta clasificada>
+[local] ruta: <nodo ejecutado>
+```
+
+`/opciones` muestra el menú estructurado. Las opciones `1` a `5` guardan una
+etiqueta para el registro y muestran un ejemplo, pero no fuerzan la ruta: la
+siguiente consulta vuelve a pasar por el router. `6` se procesa como texto
+normal, `7` imprime Mermaid y genera `grafo_ecomarket.png`. Las consultas
+siguientes continúan en el mismo loop y `/salir`, `/exit` o `/quit` finalizan
+la sesión. Las líneas vacías no ejecutan el grafo. Las palabras `grafo`,
+`diagrama`, `flujo`, `nodos` y `langgraph` muestran Mermaid sin llamar al
+modelo.
+
 ## Reglas de los nodos
 
 ### Router
@@ -58,7 +77,9 @@ redacta usando solamente el resultado de la tool.
 
 ### Conversar
 
-Usa `CHAT_HISTORY` y el prompt del asistente para mantener el contexto.
+Usa el valor actual de `CHAT_HISTORY` y el prompt del asistente. El programa
+lo inicializa como `[]` y no agrega automáticamente los turnos del loop, por
+lo que no hay memoria acumulativa entre mensajes.
 
 ### Ofertas (bonus)
 

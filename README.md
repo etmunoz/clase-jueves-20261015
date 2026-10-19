@@ -36,7 +36,9 @@ Consulta los horarios de despacho según la comuna.
 
 ### Conversación
 
-Responde usando el historial configurado en `CHAT_HISTORY`.
+El nodo recibe el mensaje y el valor actual de `CHAT_HISTORY`. El programa lo
+inicializa como `[]` al comenzar y no agrega automáticamente los turnos del
+loop, por lo que no existe memoria acumulativa entre mensajes.
 
 ### Ofertas
 
@@ -120,6 +122,31 @@ para mostrar el menú estructurado:
 
 Escribe `/salir` para terminar la conversación.
 
+También puedes escribir consultas directamente sin seleccionar una opción.
+Si eliges `1` a `5`, el programa conserva una etiqueta para el registro de la
+siguiente consulta y muestra un ejemplo, pero la intención se vuelve a
+clasificar con el router. Una línea vacía no ejecuta el agente; solicita
+un mensaje, `/opciones` o `/salir`. La opción `6` representa una consulta
+libre, aunque el valor `6` se procesa como cualquier mensaje normal. La
+opción `7` muestra el diagrama y genera el PNG sin llamar al modelo.
+
+Además, `/exit` y `/quit` funcionan como alias de `/salir`. Si el texto de la
+consulta contiene `grafo`, `diagrama`, `flujo`, `nodos` o `langgraph`, se
+imprime Mermaid y no se invoca el modelo.
+
+Cada consulta atendida muestra dos trazas antes de la respuesta:
+
+```text
+[router] ruta: ofertas
+[local] ruta: ofertas
+```
+
+La primera corresponde a la clasificación estructurada y la segunda confirma
+el nodo local que ejecutó el flujo. Las rutas posibles son `receta`, `pedido`,
+`horarios`, `ofertas` y `conversar`. Cada ruta especializada consulta primero
+sus datos simulados mediante tools y luego usa el modelo para redactar la
+respuesta; `conversar` usa el prompt del asistente y `CHAT_HISTORY`.
+
 La opción 7 imprime en pantalla el Mermaid oficial usando
 `app.get_graph().draw_mermaid()` y genera el archivo
 `grafo_ecomarket.png` en la raíz usando `app.get_graph().draw_mermaid_png()`.
@@ -131,7 +158,8 @@ la terminal el Mermaid oficial producido por:
 app.get_graph().draw_mermaid()
 ```
 
-Se pueden realizar varias consultas en una misma ejecución sin volver al menú.
+Se pueden realizar varias consultas en una misma ejecución; el menú solo
+aparece cuando escribes `/opciones`.
 
 ### Modo automático
 
@@ -185,6 +213,9 @@ Cada ejecución registra un bloque de texto legible con:
 - Ruta obtenida y ruta esperada.
 - Respuesta.
 - Error, si ocurre.
+
+En modo conversacional, cada mensaje que llega al agente se registra como una
+consulta independiente, incluyendo su ruta y respuesta.
 
 Los archivos son independientes:
 

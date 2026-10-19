@@ -17,7 +17,8 @@ El taller sigue el mismo patrón de los agentes del directorio `src/`:
 - `receta`: llama dos tools y luego redacta con el LLM.
 - `pedido`: extrae el número, consulta la tool y redacta.
 - `horarios`: consulta la tool con el mensaje completo y redacta.
-- `conversar`: conserva el historial recibido en `CHAT_HISTORY`.
+- `conversar`: pasa el valor actual de `CHAT_HISTORY` al modelo; el loop no
+  agrega automáticamente mensajes, por lo que no hay memoria acumulativa.
 - `ofertas`: consulta la tool bonus y redacta.
 
 ## Checklist de entrega
@@ -36,6 +37,11 @@ El taller sigue el mismo patrón de los agentes del directorio `src/`:
 - [x] Notebook configurado con el kernel existente `clase-jueves-20261015`.
 - [x] Notebook con una cuarta celda editable para introducir `USER_INPUT`.
 - [x] Modos del `.py` expuestos como parámetros `--consulta` y `--automatico`.
+- [x] `--consulta` inicia directamente el modo conversacional.
+- [x] `/opciones` muestra el menú y las opciones 1 a 5 etiquetan la siguiente
+      consulta sin reemplazar la clasificación del router.
+- [x] `/salir` finaliza la conversación.
+- [x] Cada consulta muestra las trazas `[router]` y `[local]`.
 - [ ] Ejecutar `Kernel → Restart and Run All` en el notebook/plataforma.
 - [ ] Probar las cinco consultas de `plan.json` y revisar el diagrama.
 - [ ] Crear el ZIP final con `taller.py`, `plan.json` y `.opencode/`.
@@ -55,6 +61,17 @@ Hola, ¿qué sabes hacer?
 Para cada caso comprobar que el router elige, respectivamente,
 `receta`, `pedido`, `horarios`, `ofertas` y `conversar`, y que la respuesta
 usa los datos de la tool correspondiente.
+
+En la prueba interactiva ejecutar `python taller/taller.py --consulta` y
+verificar que:
+
+1. El programa entra al chat sin mostrar el menú inicialmente.
+2. Una consulta normal imprime `[router]` y `[local]` con la misma ruta.
+3. `/opciones` muestra las siete opciones estructuradas.
+4. Elegir `1` a `5` muestra un ejemplo y etiqueta el registro, pero el router
+   vuelve a clasificar el texto siguiente.
+5. Una línea vacía no invoca el grafo.
+6. `/salir` termina con el mensaje `Hasta luego.`
 
 ## Nota sobre la plataforma
 

@@ -1,28 +1,9 @@
-"""Archivo: taller.py
-Descripción: agente LangGraph de atención para el ecommerce simulado EcoMarket.
+"""Agente LangGraph de atención para el ecommerce simulado EcoMarket.
+
 Autores: Fabio Durán, Gustavo Reyes y Ezequiel Muñoz
-Fecha de creación: 2026-10-15 21:08
-Última modificación: 2026-10-15 22:19
-
-TALLER · Generador de Recetas para el ecommerce "EcoMarket".
-
-Tu agente atiende clientes del supermercado por chat. Debe saber:
-  1. Recomendar RECETAS con productos de la tienda (tools simuladas)
-  2. Informar el ESTADO de un PEDIDO
-  3. Responder HORARIOS de despacho
-  4. CONVERSAR 
-  5. BONUS: un flujo nuevo inventado por ti
-
-COMO TRABAJAR (detalle completo en la pestana Docs):
-  A. Descarga El notebook o copiar el codigo de aca y pegarlo en un archivo.py dentro de visual studio.
-  B. Corre Celda por celda del notebook.
-  C. Completa TODO 1, 2 y 3 imitando el nodo `conversar`. Cada uno trae PISTA.
-  D. Prueba cada flujo con la pestana Preguntas y mira el diagrama.
-  E. Entrega: un .zip con el notebook (nombres de integrantes, prompts pegados en la celda
-     ENTREGA y TODO el codigo corriendo), mas plan.json y la carpeta .opencode/.
 
 FLUJO IMPLEMENTADO
-===================
+==================
 START
   ↓
 router (clasifica con salida estructurada Ruta)
@@ -33,9 +14,11 @@ router (clasifica con salida estructurada Ruta)
   └── conversar → historial + LLM → respuesta → END
 
 El router nunca responde el contenido por sí mismo: solo decide la ruta.
-Cada nodo especializado usa la información verificada por sus tools antes de
-redactar la respuesta. La ejecución automática puede procesar una consulta o
-los cinco ejemplos y registra cada resultado en taller/ejecuciones.log.
+El modo `--consulta` inicia directamente el chat. `/opciones` muestra las
+opciones estructuradas y `/salir` termina la sesión. Una opción numérica entre
+1 y 5 guarda una etiqueta para el registro y muestra un ejemplo; la siguiente
+consulta siempre se clasifica nuevamente con el router. Cada consulta muestra
+la ruta `[router]` y la ejecución local `[local]` antes de la respuesta.
 """
 import os
 import re
@@ -101,9 +84,10 @@ FORMAS DE EJECUCIÓN
 1) Modo interactivo:
    python taller/taller.py --consulta
    Entra directamente al chat. Escribe /opciones para ver el menú y /salir
-   para terminar.
+   para terminar. Cada consulta muestra las trazas [router] y [local].
+   Las opciones 1 a 5 solo etiquetan la siguiente consulta y muestran un
+   ejemplo; la intención real siempre la decide el router.
    La opción 7 imprime Mermaid en pantalla y genera grafo_ecomarket.png.
-   Elige 0 para salir.
 
 2) Modo automático: ejecuta los cinco ejemplos:
    python taller/taller.py --automatico
@@ -114,8 +98,8 @@ FORMAS DE EJECUCIÓN
 NOTEBOOK
 --------
 Abre taller/taller.ipynb con el kernel Python 3.12 (.venv).
-Ejecuta la primera celda, revisa los ejemplos en la segunda y selecciona
-MODO/USER_INPUT en la tercera.
+ Ejecuta las cuatro celdas en orden: configuración, diagrama, ejemplos y
+ ejecución. Edita MODO/USER_INPUT en la cuarta celda.
 
 LOGS
 ----
@@ -313,10 +297,11 @@ def router(estado: Estado):
 # PASO 6 · NODOS: cada nodo atiende una responsabilidad.
 # ═══════════════ NODO MODELO (LISTO) — imita este patron ═══════════════════
 def conversar(estado: Estado):
-    """FLUJO CONVERSACIONAL: responde con memoria del chat.
+    """Responde usando el valor actual de `CHAT_HISTORY` y el mensaje.
 
-    El entorno de ejecución inyecta el historial en CHAT_HISTORY: pasárselo al LLM
-    es lo que convierte respuestas sueltas en una CONVERSACION."""
+    El programa inicializa `CHAT_HISTORY` como una lista vacía y no la amplía
+    automáticamente durante el loop de terminal; entrega contexto inicial,
+    pero no memoria acumulativa entre turnos."""
     historial = os.environ.get("CHAT_HISTORY", "[]")
     r = llm.invoke(f"{PROMPT_ASISTENTE}\n\nHistorial de la conversacion: {historial}\n"
                    f"Cliente: {estado['entrada']}")
@@ -427,7 +412,7 @@ def ejecutar_consulta(
     nombre="consulta",
     ruta_esperada=None,
 ):
-    """Ejecuta una consulta, muestra la respuesta y registra el resultado."""
+    """Ejecuta una consulta, salvo solicitudes de diagrama, y la registra."""
     if solicita_grafo(consulta):
         return ejecutar_grafo_texto(consulta, origen, modo)
     return ejecutar_y_registrar(
@@ -440,7 +425,7 @@ def ejecutar_consulta(
 
 
 def solicita_grafo(consulta: str) -> bool:
-    """Detecta si el usuario pide ver el grafo o el flujo del agente."""
+    """Detecta palabras que muestran Mermaid sin invocar el modelo."""
     palabras = ("grafo", "diagrama", "flujo", "nodos", "langgraph")
     return any(palabra in consulta.lower() for palabra in palabras)
 
@@ -609,7 +594,7 @@ def ejecutar_ejemplos(origen="py", modo="automatico"):
 
 
 def ejecutar_interactivo():
-    """Inicia directamente el chat; /opciones muestra el menú sin salir del chat."""
+    """Inicia el chat; /opciones muestra el menú sin salir del loop."""
     opciones = {
         "1": ("recetas", EJEMPLOS_PRUEBA["recetas"]["entrada"]),
         "2": ("pedido", EJEMPLOS_PRUEBA["pedido"]["entrada"]),
@@ -653,7 +638,7 @@ Puedes elegir un número o continuar escribiendo normalmente.
             continue
         if consulta in opciones:
             opcion_activa, ejemplo = opciones[consulta]
-            print(f"Opción {consulta} seleccionada. Escribe tu consulta (ejemplo: {ejemplo}).")
+            print(f"Opción {consulta} seleccionada para el registro. Escribe tu consulta (ejemplo: {ejemplo}).")
             continue
         nombre = f"interactivo_{opcion_activa or 'conversacion'}"
         opcion_activa = None
@@ -702,7 +687,8 @@ EJEMPLOS_PRUEBA = {
 
 # %%
 # PASO 11 · EJECUCIÓN.
-# --consulta abre el menú; --automatico ejecuta los cinco casos.
+# --consulta inicia el chat; /opciones muestra el menú y /salir termina.
+# --automatico ejecuta los cinco casos documentados.
 if "--automatico" in sys.argv:
     final = ejecutar_ejemplos()
 elif "--consulta" in sys.argv:
