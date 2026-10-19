@@ -63,49 +63,80 @@ asegurar_logs()
 
 
 def mostrar_ayuda():
-    """Explica cómo ejecutar y evaluar el taller desde el archivo Python."""
+    """Muestra la guía completa de uso del programa y del notebook."""
     print(
         """
 TALLER ECOMARKET · GUÍA DE USO
 ==============================
 
-El programa atiende cinco flujos mediante LangGraph:
-  1. Recetas       → tools de recetas y precios.
-  2. Pedido        → consulta el estado de un pedido.
-  3. Horarios      → consulta horarios de despacho.
-  4. Conversación  → responde usando el asistente.
-  5. Ofertas       → bonus con promociones simuladas.
-  Si preguntas por el grafo, diagrama, flujo o nodos, se muestra el Mermaid
-  oficial generado por app.get_graph().draw_mermaid(), sin llamar al modelo.
+Descripción
+-----------
+Agente de atención construido con LangGraph. El router clasifica cada
+mensaje en una de estas rutas:
+  receta    → busca recetas y productos/precios simulados.
+  pedido    → extrae el número y consulta el estado simulado.
+  horarios  → consulta el despacho según la comuna.
+  ofertas   → consulta las promociones simuladas.
+  conversar → responde con el prompt del asistente y CHAT_HISTORY.
 
-FORMAS DE EJECUCIÓN
+Comandos principales
 --------------------
+  python taller/taller.py --consulta
+      Inicia directamente el modo conversacional; no muestra el menú al
+      comenzar.
 
-1) Modo interactivo:
-   python taller/taller.py --consulta
-   Entra directamente al chat. Escribe /opciones para ver el menú y /salir
-   para terminar. Cada consulta muestra las trazas [router] y [local].
-   Las opciones 1 a 5 solo etiquetan la siguiente consulta y muestran un
-   ejemplo; la intención real siempre la decide el router.
-   La opción 7 imprime Mermaid en pantalla y genera grafo_ecomarket.png.
+  python taller/taller.py --automatico
+      Ejecuta los cinco ejemplos documentados y muestra las rutas obtenidas
+      frente a las rutas esperadas.
 
-2) Modo automático: ejecuta los cinco ejemplos:
-   python taller/taller.py --automatico
+  python taller/taller.py --ayuda
+  python taller/taller.py -ayuda
+      Muestra esta guía.
 
-3) Ayuda:
-   python taller/taller.py --ayuda
+Modo conversacional (--consulta)
+---------------------------------
+Escribe cualquier consulta en el indicador "Tú:". El programa imprime:
+  [router] ruta: <ruta>
+  [local] ruta: <ruta>
+y luego la respuesta del flujo seleccionado.
 
-NOTEBOOK
+Comandos disponibles dentro del chat:
+  /opciones   muestra el menú estructurado sin terminar la sesión.
+  /salir      termina la sesión.
+  /exit       alias de /salir.
+  /quit       alias de /salir.
+
+El menú contiene siete opciones:
+  1–5         muestran un ejemplo y etiquetan la siguiente consulta en el
+              registro; no fuerzan la ruta, que siempre decide el router.
+  6           se procesa como texto normal, igual que cualquier consulta.
+  7           muestra Mermaid y genera grafo_ecomarket.png sin llamar al
+              modelo.
+
+Si una consulta contiene grafo, diagrama, flujo, nodos o langgraph, se muestra
+el Mermaid oficial sin llamar al modelo. Una línea vacía no ejecuta el grafo.
+
+Notebook
 --------
-Abre taller/taller.ipynb con el kernel Python 3.12 (.venv).
- Ejecuta las cuatro celdas en orden: configuración, diagrama, ejemplos y
- ejecución. Edita MODO/USER_INPUT en la cuarta celda.
+Abre taller/taller.ipynb con el kernel Python 3.12 (.venv) correspondiente.
+Ejecuta sus cuatro celdas en orden:
+  1. configuración, estado, prompts, tools, nodos y grafo;
+  2. diagrama Mermaid oficial;
+  3. ejemplos y rutas esperadas;
+  4. ejecución mediante MODO y USER_INPUT.
 
-LOGS
-----
-Las ejecuciones del .py se guardan en taller/ejecuciones_py.log.
-Las ejecuciones del notebook se guardan en taller/ejecuciones_ipynb.log.
-Cada bloque registra modo, inicio, fin, duración, ruta y respuesta.
+El notebook comparte la lógica del agente, pero no abre el loop de terminal ni
+interpreta /opciones o /salir. Usa MODO="consulta" para una consulta o
+MODO="ejemplos" para los cinco casos.
+
+Logs y configuración
+--------------------
+Configura GOOGLE_API_KEY en .env antes de ejecutar el agente.
+Los logs se guardan por separado:
+  taller/ejecuciones_py.log
+  taller/ejecuciones_ipynb.log
+Cada bloque registra modo, inicio, fin, duración, zona horaria Santiago,
+consulta, ruta, respuesta y error cuando corresponde.
 """
     )
 
@@ -694,5 +725,6 @@ if "--automatico" in sys.argv:
 elif "--consulta" in sys.argv:
     final = ejecutar_interactivo()
 else:
-    print("Debes indicar un modo: --consulta, --automatico o --ayuda.")
+    print("No se indicó un modo de ejecución.")
+    print("Usa --consulta, --automatico o --ayuda. Ejemplo: python taller/taller.py --ayuda")
     raise SystemExit(2)

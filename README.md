@@ -103,6 +103,10 @@ GEMINI_FLASH_LITE_MODEL=gemini-flash-lite-latest
 python taller/taller.py --ayuda
 ```
 
+También puedes usar el alias `-ayuda`. Si ejecutas el archivo sin un modo,
+el programa no inicia el agente: informa que falta `--consulta`,
+`--automatico` o `--ayuda`.
+
 ### Modo interactivo
 
 ```powershell
