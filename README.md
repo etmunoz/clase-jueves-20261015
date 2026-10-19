@@ -185,6 +185,13 @@ El notebook tiene cuatro celdas:
 3. **Ejemplos:** muestra las consultas disponibles y sus rutas esperadas.
 4. **Ejecución:** permite elegir entre una consulta o todos los ejemplos.
 
+El notebook conserva la misma definición de estado, prompts, tools, router,
+nodos y grafo que `taller.py`, pero su punto de entrada es distinto: no abre
+el loop de terminal ni interpreta `/opciones` o `/salir`. La cuarta celda
+ejecuta una consulta mediante `USER_INPUT` o ejecuta los cinco ejemplos con
+`MODO = "ejemplos"`; sus resultados se registran en
+`taller/ejecuciones_ipynb.log`.
+
 Para una consulta individual, edita la cuarta celda:
 
 ```python
